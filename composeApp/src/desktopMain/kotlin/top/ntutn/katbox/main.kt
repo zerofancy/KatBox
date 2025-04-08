@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -13,6 +14,8 @@ import dorkbox.systemTray.SystemTray
 import katbox.composeapp.generated.resources.Res
 import katbox.composeapp.generated.resources.kat_box
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.skiko.OS
+import org.jetbrains.skiko.hostOs
 
 fun main() = application {
     Window(
@@ -22,14 +25,22 @@ fun main() = application {
     ) {
         App()
     }
-//    Tray(
-//        icon = painterResource(Res.drawable.kat_box),
-//        tooltip = "KatBox",
-//        onAction = {
-//            exitApplication()
-//        }
-//    )
-    DorkTray()
+    if (hostOs == OS.Windows) {
+        ComposeTray(::exitApplication)
+    } else {
+        DorkTray(::exitApplication)
+    }
+}
+
+@Composable
+fun ApplicationScope.ComposeTray(onExit: () -> Unit = {}) {
+    Tray(
+        icon = painterResource(Res.drawable.kat_box),
+        tooltip = "KatBox",
+        onAction = onExit
+    ) {
+        Item("Exit", onClick = onExit) // not support chinese
+    }
 }
 
 @Composable
