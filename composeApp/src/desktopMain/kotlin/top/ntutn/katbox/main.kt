@@ -4,15 +4,17 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.kdroid.composetray.tray.api.Tray
 import katbox.composeapp.generated.resources.Res
+import katbox.composeapp.generated.resources.app_name
 import katbox.composeapp.generated.resources.kat_box
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 object App
 
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        title = "KatBox",
+        title = stringResource(Res.string.app_name),
         icon = painterResource(Res.drawable.kat_box)
     ) {
         App()
@@ -23,7 +25,7 @@ fun main() = application {
     Tray(
         iconPath = iconPath,
         windowsIconPath = windowsIconPath,
-        tooltip = "My Application",
+        tooltip = stringResource(Res.string.app_name),
         primaryAction = {
         },
         primaryActionLinuxLabel = "Open Application"
