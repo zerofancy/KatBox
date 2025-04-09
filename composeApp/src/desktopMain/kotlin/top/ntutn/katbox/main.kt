@@ -18,8 +18,8 @@ fun main() = application {
         App()
     }
 
-    val iconPath = App.javaClass.classLoader!!.getResource("kat-box.png").path
-    val windowsIconPath = App.javaClass.classLoader!!.getResource("kat-box.ico").path
+    val iconPath = App.javaClass.classLoader!!.getResource("kat-box.png")!!.path
+    val windowsIconPath = App.javaClass.classLoader!!.getResource("kat-box.ico")!!.path
     Tray(
         iconPath = iconPath,
         windowsIconPath = windowsIconPath,
