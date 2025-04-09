@@ -6,7 +6,8 @@ import com.kdroid.composetray.tray.api.Tray
 import katbox.composeapp.generated.resources.Res
 import katbox.composeapp.generated.resources.kat_box
 import org.jetbrains.compose.resources.painterResource
-import java.nio.file.Paths
+
+object App
 
 fun main() = application {
     Window(
@@ -16,8 +17,9 @@ fun main() = application {
     ) {
         App()
     }
-    val iconPath = Paths.get("src/desktopMain/resources/kat-box.png").toUri().toString()
-    val windowsIconPath = Paths.get("src/desktopMain/resources/kat-box.ico").toUri().toString()
+
+    val iconPath = App.javaClass.classLoader!!.getResource("kat-box.png").path
+    val windowsIconPath = App.javaClass.classLoader!!.getResource("kat-box.ico").path
     Tray(
         iconPath = iconPath,
         windowsIconPath = windowsIconPath,
