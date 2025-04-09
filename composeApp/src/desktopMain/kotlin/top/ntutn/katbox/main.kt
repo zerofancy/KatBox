@@ -1,21 +1,12 @@
 package top.ntutn.katbox
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.window.ApplicationScope
-import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import dorkbox.systemTray.MenuItem
-import dorkbox.systemTray.SystemTray
+import com.kdroid.composetray.tray.api.Tray
 import katbox.composeapp.generated.resources.Res
 import katbox.composeapp.generated.resources.kat_box
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.skiko.OS
-import org.jetbrains.skiko.hostOs
+import java.nio.file.Paths
 
 fun main() = application {
     Window(
@@ -25,33 +16,53 @@ fun main() = application {
     ) {
         App()
     }
-    if (hostOs == OS.Windows) {
-        ComposeTray(::exitApplication)
-    } else {
-        DorkTray(::exitApplication)
-    }
-}
-
-@Composable
-fun ApplicationScope.ComposeTray(onExit: () -> Unit = {}) {
+    val iconPath = Paths.get("src/desktopMain/resources/kat-box.png").toUri().toString()
+    val windowsIconPath = Paths.get("src/desktopMain/resources/kat-box.ico").toUri().toString()
     Tray(
-        icon = painterResource(Res.drawable.kat_box),
-        tooltip = "KatBox",
-        onAction = onExit
+        iconPath = iconPath,
+        windowsIconPath = windowsIconPath,
+        tooltip = "My Application",
+        primaryAction = {
+        },
+        primaryActionLinuxLabel = "Open Application"
     ) {
-        Item("Exit", onClick = onExit) // not support chinese
-    }
-}
+        SubMenu(label = "Options") {
+            Item(label = "Setting 1") {
+            }
+            SubMenu(label = "Advanced Sub-options") {
+                Item(label = "Advanced Option 1") {
+                }
+                Item(label = "Advanced Option 2") {
+                }
+            }
+        }
 
-@Composable
-fun DorkTray(onExit: () -> Unit = {}) {
-    val tray by remember { mutableStateOf(SystemTray.get()!!) }
+        Divider()
 
-    LaunchedEffect(true) {
-        //tray.installShutdownHook() // Auto-remove icon when application is killed
-        tray.setImage(javaClass.getResourceAsStream("/kat-box.png")) // Use icon in src/main/resources/icon.png
-        tray.menu.add(MenuItem("退出").apply {
-            setCallback { onExit() }
-        })
+        SubMenu(label = "Tools") {
+            Item(label = "Calculator") {
+            }
+            Item(label = "Notepad") {
+            }
+        }
+
+        Divider()
+
+        CheckableItem(label = "Enable notifications") { isChecked ->
+        }
+
+        Divider()
+
+        Item(label = "About") {
+        }
+
+        Divider()
+
+        Item(label = "Exit", isEnabled = true) {
+            dispose()
+            exitApplication()
+        }
+
+        Item(label = "Version 1.0.0", isEnabled = false)
     }
 }
