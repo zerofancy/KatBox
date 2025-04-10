@@ -7,16 +7,18 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun ChatArea(modifier: Modifier = Modifier) {
+fun ChatArea(modifier: Modifier = Modifier, viewModel: ChatAreaViewModel = viewModel { ChatAreaViewModel() }) {
     Column(modifier) {
-        var history by remember { mutableStateOf("") }
+        val history by viewModel.historyStateFlow.collectAsState()
         TextField(modifier = Modifier.fillMaxWidth().weight(1f), value = history, onValueChange = {})
         Row(modifier = Modifier.fillMaxWidth()) {
             var inputtingText by remember { mutableStateOf("") }
@@ -24,8 +26,7 @@ fun ChatArea(modifier: Modifier = Modifier) {
                 inputtingText = it
             })
             Button(enabled = inputtingText.isNotBlank(), onClick = {
-                history += inputtingText
-                history += "\n"
+                viewModel.sendMessage(inputtingText)
                 inputtingText = ""
             }) {
                 Text("Send")
