@@ -27,6 +27,10 @@ class ChatAreaViewModel: ViewModel() {
         _historyStateFlow.value += "Server: $models"
     }
 
+    fun selectModel(model: Model) = viewModelScope.launch {
+        _selectedModel.value = model
+    }
+
     fun sendMessage(value: String) {
         _historyStateFlow.value += "User: $value\n"
         viewModelScope.launch {
