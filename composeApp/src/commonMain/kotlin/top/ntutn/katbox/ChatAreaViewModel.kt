@@ -4,15 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.ktor.client.call.body
 import io.ktor.client.request.get
-import io.ktor.client.request.post
+import io.ktor.client.request.preparePost
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.readUTF8Line
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import top.ntutn.katbox.logger.slf4jLogger
 import top.ntutn.katbox.model.GenerateRequest
 import top.ntutn.katbox.model.GenerateResponse
@@ -28,6 +31,8 @@ class ChatAreaViewModel : ViewModel() {
     private val _selectedModel = MutableStateFlow<Model?>(null)
     val selectedModel: StateFlow<Model?> = _selectedModel
     val modelsStateFlow: StateFlow<List<Model>> = _modelsStateFlow
+
+    private var generateResponseJob: Job? = null
 
     fun fetchModels() = viewModelScope.launch {
         val response = runCatching {
@@ -45,27 +50,49 @@ class ChatAreaViewModel : ViewModel() {
     }
 
     fun sendMessage(value: String) = viewModelScope.launch {
+        generateResponseJob?.apply {
+            _historyStateFlow.value += "..Canceled\n"
+            cancel()
+        }
         _historyStateFlow.value += "User: $value\n"
+        generateResponseJob = viewModelScope.launch {
+            try {
+                generateResponse(value)
+            } catch (e: Exception) {
+                logger.error("Generate response failed", e)
+                _historyStateFlow.value += "..Failed\n"
+            } finally {
+                generateResponseJob = null
+            }
+        }
+    }
+
+    private suspend fun generateResponse(value: String) {
         val selectedModel = selectedModel.value
         if (selectedModel == null) {
             _historyStateFlow.value += "System: No Model Selected"
-            return@launch
+            return
         }
         val request = GenerateRequest(
             model = selectedModel.name,
             value,
-            false
+            true
         )
-        val response = kotlin.runCatching {
-            getPlatform().httpClient.post("http://localhost:11434/api/generate") {
-                contentType(ContentType.Application.Json)
-                setBody(request)
+        val statement = getPlatform().httpClientWithoutTimeout.preparePost("http://localhost:11434/api/generate") {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+        val channel = statement.body<ByteReadChannel>()
+        val json = getPlatform().jsonClient
+        _historyStateFlow.value += "Server: "
+        while (!channel.isClosedForRead) {
+            val line = channel.readUTF8Line() ?: break
+            logger.debug("received $line")
+            val generateResponse = withContext(Dispatchers.Default) {
+                json.decodeFromString<GenerateResponse>(line)
             }
-        }.onFailure {
-            logger.error("generate response failed", it)
-        }.getOrNull()
-
-        val generateResponse = response?.body<GenerateResponse>()
-        _historyStateFlow.value += "Server: ${generateResponse?.response}\n"
+            _historyStateFlow.value += generateResponse.response
+        }
+        _historyStateFlow.value += "\n"
     }
 }

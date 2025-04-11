@@ -8,12 +8,19 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 class JVMPlatform: Platform {
-    private val jsonClient = Json {
+    override val jsonClient = Json {
         ignoreUnknownKeys = true
+        coerceInputValues = true  // 自动转换无效值为默认值
+        explicitNulls = false     // 不序列化null值字段
     }
 
     override val name: String = "Java ${System.getProperty("java.version")}"
     override val httpClient: HttpClient = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(jsonClient)
+        }
+    }
+    override val httpClientWithoutTimeout: HttpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(jsonClient)
         }

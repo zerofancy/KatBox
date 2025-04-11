@@ -17,6 +17,6 @@ data class GenerateResponse(
     @SerialName("created_at") val createdAt: String,
     val response: String,
     val done: Boolean,
-    val context: List<Int>,
-    @SerialName("total_duration") val totalDuration: Long,
+    val context: List<Int>?,
+    @SerialName("total_duration") val totalDuration: Long?,
 )
