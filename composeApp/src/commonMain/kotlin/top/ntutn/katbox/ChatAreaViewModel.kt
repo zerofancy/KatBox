@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.launch
+import top.ntutn.katbox.logger.slf4jLogger
 import top.ntutn.katbox.model.GenerateRequest
 import top.ntutn.katbox.model.GenerateResponse
 import top.ntutn.katbox.model.Model
@@ -21,6 +22,7 @@ import top.ntutn.katbox.model.OllamaModelsResponse
 class ChatAreaViewModel : ViewModel() {
     private val _historyStateFlow = MutableStateFlow("")
     val historyStateFlow: StateFlow<String> = _historyStateFlow
+    private val logger by slf4jLogger("vm")
 
     private val _modelsStateFlow = MutableStateFlow<List<Model>>(emptyList())
     private val _selectedModel = MutableStateFlow<Model?>(null)
@@ -31,7 +33,7 @@ class ChatAreaViewModel : ViewModel() {
         val response = runCatching {
             getPlatform().httpClient.get("http://localhost:11434/api/tags")
         }.onFailure {
-            // todo toast no valid model
+            logger.error("fetch model failed", it)
         }.getOrNull()
         val models = response?.body<OllamaModelsResponse>()
         _modelsStateFlow.value = models?.models ?: emptyList()
@@ -60,7 +62,7 @@ class ChatAreaViewModel : ViewModel() {
                 setBody(request)
             }
         }.onFailure {
-            it.printStackTrace()
+            logger.error("generate response failed", it)
         }.getOrNull()
 
         val generateResponse = response?.body<GenerateResponse>()
