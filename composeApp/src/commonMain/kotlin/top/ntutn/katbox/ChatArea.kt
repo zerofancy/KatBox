@@ -7,6 +7,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +32,9 @@ fun ChatArea(modifier: Modifier = Modifier, viewModel: ChatAreaViewModel = viewM
             }) {
                 Text("Send")
             }
+        }
+        LaunchedEffect(Unit) {
+            viewModel.fetchModels()
         }
     }
 }
