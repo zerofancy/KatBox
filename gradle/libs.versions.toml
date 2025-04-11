@@ -11,7 +11,9 @@ kotlin = "2.1.10"
 kotlinx-coroutines = "1.10.1"
 ktorClientCore = "3.1.2"
 lifecycleViewmodelCompose = "2.8.2"
-systemtray = "4.4"
+logbackClassic = "1.5.18"
+slf4jAndroid = "1.7.36"
+slf4jApi = "2.0.17"
 
 [libraries]
 composenativetray = { module = "io.github.kdroidfilter:composenativetray", version.ref = "composenativetray" }
@@ -25,7 +27,9 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorCli
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientCore" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClientCore" }
 lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
-systemtray = { module = "com.dorkbox:SystemTray", version.ref = "systemtray" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
+slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4jAndroid" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4jApi" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -27,6 +27,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.slf4j.android)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -42,12 +43,14 @@ kotlin {
             // 如果需要 JSON 序列化
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.slf4j.api)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.composenativetray)
             implementation(libs.ktor.client.cio)
+            implementation(libs.logback.classic)
         }
     }
 }
