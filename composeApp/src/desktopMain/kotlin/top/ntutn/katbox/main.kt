@@ -12,6 +12,7 @@ import org.jetbrains.compose.resources.stringResource
 object App
 
 fun main() = application {
+    CrashAnalysisUtil.plant()
     Window(
         onCloseRequest = ::exitApplication,
         title = stringResource(Res.string.app_name),
