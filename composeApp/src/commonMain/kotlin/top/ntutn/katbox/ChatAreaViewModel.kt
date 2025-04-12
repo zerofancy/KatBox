@@ -33,6 +33,7 @@ class ChatAreaViewModel : ViewModel() {
     val modelsStateFlow: StateFlow<List<Model>> = _modelsStateFlow
 
     private var generateResponseJob: Job? = null
+    private var generateContext: List<Int>? = null
 
     fun fetchModels() = viewModelScope.launch {
         val response = runCatching {
@@ -43,10 +44,14 @@ class ChatAreaViewModel : ViewModel() {
         val models = response?.body<OllamaModelsResponse>()
         _modelsStateFlow.value = models?.models ?: emptyList()
         _selectedModel.value = models?.models?.firstOrNull()
+        generateContext = null
     }
 
     fun selectModel(model: Model) = viewModelScope.launch {
-        _selectedModel.value = model
+        if (model != _selectedModel.value) {
+            generateContext = null
+            _selectedModel.value = model
+        }
     }
 
     fun sendMessage(value: String) = viewModelScope.launch {
@@ -76,7 +81,8 @@ class ChatAreaViewModel : ViewModel() {
         val request = GenerateRequest(
             model = selectedModel.name,
             value,
-            true
+            true,
+            generateContext
         )
         val statement = getPlatform().httpClientWithoutTimeout.preparePost("http://localhost:11434/api/generate") {
             contentType(ContentType.Application.Json)
@@ -92,6 +98,9 @@ class ChatAreaViewModel : ViewModel() {
                 json.decodeFromString<GenerateResponse>(line)
             }
             _historyStateFlow.value += generateResponse.response
+            generateResponse.context?.let {
+                generateContext = it
+            }
         }
         _historyStateFlow.value += "\n"
     }

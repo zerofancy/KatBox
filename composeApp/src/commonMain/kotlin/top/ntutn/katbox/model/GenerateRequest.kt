@@ -8,7 +8,8 @@ import kotlinx.serialization.Serializable
 data class GenerateRequest(
     val model: String,
     val prompt: String,
-    val stream: Boolean
+    val stream: Boolean,
+    val context: List<Int>? // context 已经被废弃，检查下用什么代替。
 )
 
 @Serializable
