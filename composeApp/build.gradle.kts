@@ -102,6 +102,8 @@ compose.desktop {
             }
             linux {
                 iconFile.set(project.file("src/desktopMain/resources/kat-box.png"))
+                debMaintainer = "ntutn.top@gmail.com"
+                menuGroup = "ntutn"
             }
         }
     }
