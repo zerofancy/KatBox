@@ -76,8 +76,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -93,6 +93,16 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "top.ntutn.katbox"
             packageVersion = "1.0.0"
+            description = "一个简单的AI聊天前端，可以连接本地Ollama。"
+
+            windows {
+                iconFile.set(project.file("src/desktopMain/resources/kat-box.ico"))
+                menuGroup = "ntutn"
+                upgradeUuid = "629dcd7c-2296-483b-9f2b-136e26be7dc8"
+            }
+            linux {
+                iconFile.set(project.file("src/desktopMain/resources/kat-box.png"))
+            }
         }
     }
 }
