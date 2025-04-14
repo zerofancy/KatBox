@@ -3,6 +3,7 @@ package top.ntutn.katbox
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.kdroid.composetray.tray.api.Tray
+import com.vaadin.open.Open
 import katbox.composeapp.generated.resources.Res
 import katbox.composeapp.generated.resources.app_name
 import katbox.composeapp.generated.resources.kat_box
@@ -31,34 +32,8 @@ fun main() = application {
         },
         primaryActionLinuxLabel = "Open Application"
     ) {
-        SubMenu(label = "Options") {
-            Item(label = "Setting 1") {
-            }
-            SubMenu(label = "Advanced Sub-options") {
-                Item(label = "Advanced Option 1") {
-                }
-                Item(label = "Advanced Option 2") {
-                }
-            }
-        }
-
-        Divider()
-
-        SubMenu(label = "Tools") {
-            Item(label = "Calculator") {
-            }
-            Item(label = "Notepad") {
-            }
-        }
-
-        Divider()
-
-        CheckableItem(label = "Enable notifications") { isChecked ->
-        }
-
-        Divider()
-
         Item(label = "About") {
+            Open.open("https://github.com/zerofancy/KatBox")
         }
 
         Divider()
