@@ -105,6 +105,11 @@ compose.desktop {
                 debMaintainer = "ntutn.top@gmail.com"
                 menuGroup = "ntutn"
             }
+            macOS {
+                iconFile.set(project.file("src/desktopMain/resources/icon.icns"))
+                bundleID = "top.ntutn.katbox"
+                dockName = "KatBox"
+            }
         }
     }
 }
