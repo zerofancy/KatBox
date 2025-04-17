@@ -13,6 +13,7 @@ import katbox.composeapp.generated.resources.app_name
 import katbox.composeapp.generated.resources.kat_box
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.skiko.hostOs
 
 object App
 
@@ -37,12 +38,14 @@ fun main() = application {
         primaryAction = {
             visible = !visible
         },
-        primaryActionLinuxLabel = "Open Application"
+        primaryActionLinuxLabel = "KatBox"
     ) {
-        Item(label = "Show/Hide") {
-            visible = !visible
+        if (!hostOs.isLinux) {
+            Item(label = "Show/Hide") {
+                visible = !visible
+            }
+            Divider()
         }
-        Divider()
         Item(label = "About") {
             Open.open("https://github.com/zerofancy/KatBox")
         }
@@ -50,7 +53,5 @@ fun main() = application {
             dispose()
             exitApplication()
         }
-        Divider()
-        Item(label = "Version 1.0.0", isEnabled = false)
     }
 }
