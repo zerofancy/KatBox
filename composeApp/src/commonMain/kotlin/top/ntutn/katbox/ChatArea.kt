@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
@@ -22,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.Model
 
 @Composable
@@ -32,15 +34,18 @@ fun ChatArea(
     Column(modifier) {
         val history by viewModel.historyStateFlow.collectAsState()
         val composing by viewModel.composingMessage.collectAsState()
-        val historyContent = remember(history, composing) {
-            (history + composing).filterNotNull().joinToString(separator = "\n") {
-                "${it.role}(${it.timestamp}): ${it.text}"
+        LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
+            items(history.size) { i ->
+                val item = history[i]
+                MessageLine(message = item)
+            }
+            val item = composing
+            if (item != null) {
+                item {
+                    MessageLine(item)
+                }
             }
         }
-        TextField(
-            modifier = Modifier.fillMaxWidth().weight(1f),
-            value = historyContent,
-            onValueChange = {})
         Row(modifier = Modifier.fillMaxWidth()) {
             var inputtingText by remember { mutableStateOf("") }
             TextField(value = inputtingText, modifier = Modifier.weight(1f), onValueChange = {
@@ -64,7 +69,12 @@ fun ChatArea(
 }
 
 @Composable
-fun ModelSelectDropDown(models: List<Model>, selectedModel: Model?, modifier: Modifier = Modifier, onSelectModel: (Model) -> Unit) {
+fun ModelSelectDropDown(
+    models: List<Model>,
+    selectedModel: Model?,
+    modifier: Modifier = Modifier,
+    onSelectModel: (Model) -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
@@ -84,4 +94,13 @@ fun ModelSelectDropDown(models: List<Model>, selectedModel: Model?, modifier: Mo
             }
         }
     }
+}
+
+@Composable
+fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
+    val text = "${message.role}(${message.timestamp}): ${message.text}"
+    Text(
+        text = text,
+        modifier = modifier
+    )
 }
