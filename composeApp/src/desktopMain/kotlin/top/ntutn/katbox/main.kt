@@ -1,5 +1,9 @@
 package top.ntutn.katbox
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.kdroid.composetray.tray.api.Tray
@@ -14,10 +18,12 @@ object App
 
 fun main() = application {
     CrashAnalysisUtil.plant()
+    var visible by remember { mutableStateOf(true) }
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = { visible = false},
         title = stringResource(Res.string.app_name),
-        icon = painterResource(Res.drawable.kat_box)
+        icon = painterResource(Res.drawable.kat_box),
+        visible = visible,
     ) {
         App()
     }
@@ -29,20 +35,22 @@ fun main() = application {
         windowsIconPath = windowsIconPath,
         tooltip = stringResource(Res.string.app_name),
         primaryAction = {
+            visible = !visible
         },
         primaryActionLinuxLabel = "Open Application"
     ) {
+        Item(label = "Show/Hide") {
+            visible = !visible
+        }
+        Divider()
         Item(label = "About") {
             Open.open("https://github.com/zerofancy/KatBox")
         }
-
-        Divider()
-
         Item(label = "Exit", isEnabled = true) {
             dispose()
             exitApplication()
         }
-
+        Divider()
         Item(label = "Version 1.0.0", isEnabled = false)
     }
 }
