@@ -17,14 +17,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import top.ntutn.katbox.logger.slf4jLogger
+import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.GenerateRequest
 import top.ntutn.katbox.model.GenerateResponse
 import top.ntutn.katbox.model.Model
 import top.ntutn.katbox.model.OllamaModelsResponse
 
 class ChatAreaViewModel : ViewModel() {
-    private val _historyStateFlow = MutableStateFlow("")
-    val historyStateFlow: StateFlow<String> = _historyStateFlow
+    private val _historyStateFlow = MutableStateFlow(listOf<ChatMessage>())
+    val historyStateFlow: StateFlow<List<ChatMessage>> = _historyStateFlow
+    private val _composingMessage = MutableStateFlow<ChatMessage?>(null)
+    val composingMessage: StateFlow<ChatMessage?> = _composingMessage
     private val logger by slf4jLogger("vm")
 
     private val _modelsStateFlow = MutableStateFlow<List<Model>>(emptyList())
@@ -55,17 +58,22 @@ class ChatAreaViewModel : ViewModel() {
     }
 
     fun sendMessage(value: String) = viewModelScope.launch {
-        generateResponseJob?.apply {
-            _historyStateFlow.value += "..Canceled\n"
-            cancel()
+        generateResponseJob?.cancel()
+        composingMessage.value?.let {
+            _historyStateFlow.value += it
         }
-        _historyStateFlow.value += "User: $value\n"
+        _composingMessage.value = null
+        _historyStateFlow.value += ChatMessage(
+            timestamp = System.currentTimeMillis(),
+            text = value,
+            role = "User",
+            completed = true
+        )
         generateResponseJob = viewModelScope.launch {
             try {
                 generateResponse(value)
             } catch (e: Exception) {
                 logger.error("Generate response failed", e)
-                _historyStateFlow.value += "..Failed\n"
             } finally {
                 generateResponseJob = null
             }
@@ -75,7 +83,12 @@ class ChatAreaViewModel : ViewModel() {
     private suspend fun generateResponse(value: String) {
         val selectedModel = selectedModel.value
         if (selectedModel == null) {
-            _historyStateFlow.value += "System: No Model Selected"
+            _composingMessage.value = ChatMessage(
+                timestamp = System.currentTimeMillis(),
+                text = "No Selected Model",
+                role = "System",
+                completed = true
+            )
             return
         }
         val request = GenerateRequest(
@@ -90,18 +103,25 @@ class ChatAreaViewModel : ViewModel() {
         }
         val channel = statement.body<ByteReadChannel>()
         val json = getPlatform().jsonClient
-        _historyStateFlow.value += "Server: "
+        _composingMessage.value = ChatMessage(
+            timestamp = System.currentTimeMillis(),
+            text = "",
+            role = "Assistant",
+            completed = false
+        )
         while (!channel.isClosedForRead) {
             val line = channel.readUTF8Line() ?: break
             logger.debug("received $line")
             val generateResponse = withContext(Dispatchers.Default) {
                 json.decodeFromString<GenerateResponse>(line)
             }
-            _historyStateFlow.value += generateResponse.response
+            _composingMessage.value = _composingMessage.value?.let {
+                it.copy(text = it.text + generateResponse.response)
+            }
             generateResponse.context?.let {
                 generateContext = it
             }
         }
-        _historyStateFlow.value += "\n"
+        _composingMessage.value = _composingMessage.value?.copy(completed = true)
     }
 }

@@ -31,9 +31,15 @@ fun ChatArea(
 ) {
     Column(modifier) {
         val history by viewModel.historyStateFlow.collectAsState()
+        val composing by viewModel.composingMessage.collectAsState()
+        val historyContent = remember(history, composing) {
+            (history + composing).filterNotNull().joinToString(separator = "\n") {
+                "${it.role}(${it.timestamp}): ${it.text}"
+            }
+        }
         TextField(
             modifier = Modifier.fillMaxWidth().weight(1f),
-            value = history,
+            value = historyContent,
             onValueChange = {})
         Row(modifier = Modifier.fillMaxWidth()) {
             var inputtingText by remember { mutableStateOf("") }
