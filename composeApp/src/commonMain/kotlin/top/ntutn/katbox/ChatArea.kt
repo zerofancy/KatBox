@@ -3,7 +3,9 @@ package top.ntutn.katbox
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -22,9 +24,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
 import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.Model
+import java.text.SimpleDateFormat
 
 @Composable
 fun ChatArea(
@@ -98,9 +104,25 @@ fun ModelSelectDropDown(
 
 @Composable
 fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
-    val text = "${message.role}(${message.timestamp}): ${message.text}"
-    Text(
-        text = text,
-        modifier = modifier
-    )
+    Column(modifier = modifier) {
+        Row {
+            Text(text = message.role)
+            Spacer(modifier = Modifier.width(8.dp))
+            val sdf = remember { SimpleDateFormat("HH:mm:ss") }
+            val timeString = remember(message.timestamp) {
+                sdf.format(message.timestamp)
+            }
+            Text(text = timeString)
+        }
+
+        val state = rememberRichTextState()
+        LaunchedEffect(message.text) {
+            state.setMarkdown(message.text)
+        }
+        RichTextEditor(
+            state = state,
+            modifier = Modifier.fillMaxWidth(),
+            readOnly = true
+        )
+    }
 }
