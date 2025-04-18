@@ -36,11 +36,13 @@ fun main() = application {
         windowsIconPath = windowsIconPath,
         tooltip = stringResource(Res.string.app_name),
         primaryAction = {
-            visible = !visible
+            if (!hostOs.isMacOS) {
+                visible = !visible
+            }
         },
         primaryActionLinuxLabel = "KatBox"
     ) {
-        if (!hostOs.isLinux) {
+        if (hostOs.isWindows) {
             Item(label = "Show/Hide") {
                 visible = !visible
             }
