@@ -1,5 +1,6 @@
 package top.ntutn.katbox
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
@@ -105,7 +107,8 @@ fun ModelSelectDropDown(
 @Composable
 fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Row {
+        var showOriginMarkdown by remember { mutableStateOf(false) }
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = message.role)
             Spacer(modifier = Modifier.width(8.dp))
             val sdf = remember { SimpleDateFormat("HH:mm:ss") }
@@ -113,16 +116,23 @@ fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
                 sdf.format(message.timestamp)
             }
             Text(text = timeString)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = if (showOriginMarkdown) "M" else "R")
+            Switch(showOriginMarkdown, onCheckedChange = { showOriginMarkdown = it })
         }
 
         val state = rememberRichTextState()
         LaunchedEffect(message.text) {
             state.setMarkdown(message.text)
         }
-        OutlinedRichTextEditor(
-            state = state,
-            modifier = Modifier.fillMaxWidth(),
-            readOnly = true
-        )
+        if (showOriginMarkdown) {
+            TextField(value = message.text, onValueChange = {}, modifier = Modifier.fillMaxWidth())
+        } else {
+            OutlinedRichTextEditor(
+                state = state,
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true
+            )
+        }
     }
 }
