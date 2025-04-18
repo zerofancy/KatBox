@@ -1,0 +1,5 @@
+<resources>
+    <string name="tray_menu_show_hide">显示/隐藏</string>
+    <string name="tray_menu_about">关于</string>
+    <string name="tray_menu_exit">退出</string>
+</resources>
