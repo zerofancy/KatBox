@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mohamedrejeb.richeditor.model.rememberRichTextState
-import com.mohamedrejeb.richeditor.ui.material3.RichTextEditor
+import com.mohamedrejeb.richeditor.ui.material3.OutlinedRichTextEditor
 import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.Model
 import java.text.SimpleDateFormat
@@ -119,7 +119,7 @@ fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
         LaunchedEffect(message.text) {
             state.setMarkdown(message.text)
         }
-        RichTextEditor(
+        OutlinedRichTextEditor(
             state = state,
             modifier = Modifier.fillMaxWidth(),
             readOnly = true
