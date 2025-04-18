@@ -93,7 +93,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "top.ntutn.katbox"
-            packageVersion = "1.2.0"
+            packageVersion = "1.2.1"
             description = "一个简单的AI聊天前端，可以连接本地Ollama。"
 
             windows {
