@@ -1,5 +1,6 @@
 package top.ntutn.katbox
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -133,7 +134,13 @@ fun ModelSelectDropDown(
 @Composable
 fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        var showOriginMarkdown by remember { mutableStateOf(false) }
+        var showOriginMarkdown by remember { mutableStateOf(!message.completed) }
+        // todo Markdown刷新时会闪烁，现在默认不渲染在完成时一次性渲染避免闪烁
+        LaunchedEffect(message.completed) {
+            if (message.completed) {
+                showOriginMarkdown = false
+            }
+        }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = message.role)
             Spacer(modifier = Modifier.width(8.dp))
@@ -150,49 +157,81 @@ fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
         if (showOriginMarkdown) {
             TextField(value = message.text, onValueChange = {}, modifier = Modifier.fillMaxWidth())
         } else {
-            val isDarkTheme = isSystemInDarkTheme()
-            val highlightsBuilder = remember(isDarkTheme) {
-                Highlights.Builder().theme(SyntaxThemes.atom(darkMode = isDarkTheme))
+            val result = remember(message.text) {
+                val thinkStart = message.text.indexOf("<think>", ignoreCase = true)
+                var thinkStop = -1
+                var think = ""
+                var output = ""
+                if (thinkStart >= 0) {
+                    thinkStop = message.text.indexOf("</think>", ignoreCase = true)
+                    if (thinkStop < 0) {
+                        thinkStop = message.text.length - 1
+                    } else {
+                        thinkStop += 8
+                    }
+                    think = message.text.substring(thinkStart, thinkStop)
+                    if (thinkStop < message.text.length - 1) {
+                        output = message.text.substring(thinkStop, message.text.length - 1)
+                    }
+                } else {
+                    output = message.text
+                }
+                think to output
             }
-            SelectionContainer {
-                Markdown(
-                    markdownState = rememberMarkdownState(message.text),
-                    colors = markdownColor(),
-                    typography = markdownTypography(),
-                    components = markdownComponents(
-                        codeBlock = {
-                            MarkdownHighlightedCodeBlock(
-                                content = it.content,
-                                node = it.node,
-                                highlights = highlightsBuilder
-                            )
-                        },
-                        codeFence = {
-                            MarkdownHighlightedCodeFence(
-                                content = it.content,
-                                node = it.node,
-                                highlights = highlightsBuilder
-                            )
-                        },
-                        checkbox = { MarkdownCheckBox(it.content, it.node, it.typography.text) }
-                    ),
-                    extendedSpans = markdownExtendedSpans {
-                        val animator = rememberSquigglyUnderlineAnimator()
-                        remember {
-                            ExtendedSpans(
-                                RoundedCornerSpanPainter(),
-                                SquigglyUnderlineSpanPainter(animator = animator)
-                            )
-                        }
-                    },
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .wrapContentSize()
-//                    .verticalScroll(rememberScrollState())
-                        .padding(16.dp)
-                )
+
+            if (result.first.isNotEmpty()) {
+                SelectionContainer {
+                    Text(result.first, modifier = Modifier.background(Color.LightGray))
+                }
             }
+
+            MarkdownViewer(result.second)
         }
+    }
+}
+
+@Composable
+fun MarkdownViewer(markdown: String, modifier: Modifier = Modifier) {
+    val isDarkTheme = isSystemInDarkTheme()
+    val highlightsBuilder = remember(isDarkTheme) {
+        Highlights.Builder().theme(SyntaxThemes.atom(darkMode = isDarkTheme))
+    }
+    SelectionContainer {
+        Markdown(
+            markdownState = rememberMarkdownState(markdown),
+            colors = markdownColor(),
+            typography = markdownTypography(),
+            components = markdownComponents(
+                codeBlock = {
+                    MarkdownHighlightedCodeBlock(
+                        content = it.content,
+                        node = it.node,
+                        highlights = highlightsBuilder
+                    )
+                },
+                codeFence = {
+                    MarkdownHighlightedCodeFence(
+                        content = it.content,
+                        node = it.node,
+                        highlights = highlightsBuilder
+                    )
+                },
+                checkbox = { MarkdownCheckBox(it.content, it.node, it.typography.text) }
+            ),
+            extendedSpans = markdownExtendedSpans {
+                val animator = rememberSquigglyUnderlineAnimator()
+                remember {
+                    ExtendedSpans(
+                        RoundedCornerSpanPainter(),
+                        SquigglyUnderlineSpanPainter(animator = animator)
+                    )
+                }
+            },
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentSize()
+                .padding(16.dp)
+        )
     }
 }
 
