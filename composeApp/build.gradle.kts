@@ -43,6 +43,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.slf4j.api)
             implementation(libs.richeditor.compose)
+            implementation(libs.commonmark)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
