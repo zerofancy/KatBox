@@ -42,7 +42,8 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.slf4j.api)
-            implementation(libs.richeditor.compose)
+            implementation(libs.multiplatform.markdown.renderer)
+            implementation(libs.multiplatform.markdown.renderer.code)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
