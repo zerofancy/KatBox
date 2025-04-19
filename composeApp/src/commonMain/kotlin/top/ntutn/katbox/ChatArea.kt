@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -25,12 +27,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
@@ -38,6 +43,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mikepenz.markdown.compose.Markdown
@@ -57,6 +63,7 @@ import com.mikepenz.markdown.model.markdownExtendedSpans
 import com.mikepenz.markdown.model.rememberMarkdownState
 import dev.snipme.highlights.Highlights
 import dev.snipme.highlights.model.SyntaxThemes
+import kotlinx.coroutines.delay
 import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.Model
 import java.text.SimpleDateFormat
@@ -134,13 +141,8 @@ fun ModelSelectDropDown(
 @Composable
 fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        var showOriginMarkdown by remember { mutableStateOf(!message.completed) }
-        // todo Markdown刷新时会闪烁，现在默认不渲染在完成时一次性渲染避免闪烁
-        LaunchedEffect(message.completed) {
-            if (message.completed) {
-                showOriginMarkdown = false
-            }
-        }
+        var showOriginMarkdown by remember { mutableStateOf(false) }
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(text = message.role)
             Spacer(modifier = Modifier.width(8.dp))
@@ -185,7 +187,65 @@ fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
                 }
             }
 
-            MarkdownViewer(result.second)
+            // 避免闪烁思路：延迟父布局高度变化
+            // todo 拆分每段落合并一次？
+            StableMarkdownContainer {
+                MarkdownViewer(result.second)
+            }
+        }
+    }
+}
+
+@Composable
+fun StableMarkdownContainer(
+    modifier: Modifier = Modifier,
+    debounceTime: Long = 300,
+    content: @Composable () -> Unit
+) {
+    val density = LocalDensity.current
+    var measuredHeight by remember { mutableIntStateOf(-1) }
+    var appliedHeight by remember { mutableStateOf(Dp.Unspecified) }
+    var isInitialPass by remember { mutableStateOf(true) }
+
+    LaunchedEffect(measuredHeight) {
+        if (measuredHeight <= 0) return@LaunchedEffect
+
+        val targetDp = with(density) { measuredHeight.toDp() }
+
+        when {
+            // 首次测量立即应用
+            isInitialPass -> {
+                appliedHeight = targetDp
+                isInitialPass = false
+            }
+            // 后续变化防抖处理
+            else -> {
+                delay(debounceTime)
+                appliedHeight = targetDp
+            }
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .then(
+                if (appliedHeight == Dp.Unspecified) {
+                    Modifier.wrapContentHeight() // 首次测量不限制高度
+                } else {
+                    Modifier.heightIn(min = appliedHeight)
+                }
+            )
+    ) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .onSizeChanged { size ->
+                    if (size.height > 0 && size.height != measuredHeight) {
+                        measuredHeight = size.height
+                    }
+                }
+        ) {
+            content()
         }
     }
 }
