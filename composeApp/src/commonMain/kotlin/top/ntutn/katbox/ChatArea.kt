@@ -1,11 +1,14 @@
 package top.ntutn.katbox
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -13,12 +16,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -30,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,6 +71,7 @@ import com.mikepenz.markdown.model.rememberMarkdownState
 import dev.snipme.highlights.Highlights
 import dev.snipme.highlights.model.SyntaxThemes
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.Model
 import java.text.SimpleDateFormat
@@ -76,15 +84,42 @@ fun ChatArea(
     Column(modifier) {
         val history by viewModel.historyStateFlow.collectAsState()
         val composing by viewModel.composingMessage.collectAsState()
-        LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f)) {
-            items(history.size) { i ->
-                val item = history[i]
-                MessageLine(message = item)
+
+        Box(modifier = Modifier.weight(1f)) {
+            val listState = rememberLazyListState()
+            val scope = rememberCoroutineScope() // 获取协程作用域
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                state = listState
+            ) {
+                items(history.size) { i ->
+                    val item = history[i]
+                    MessageLine(message = item)
+                }
+                val item = composing
+                if (item != null) {
+                    item {
+                        MessageLine(item)
+                    }
+                }
             }
-            val item = composing
-            if (item != null) {
-                item {
-                    MessageLine(item)
+
+            // 显示滚动到底部按钮的条件
+            if (listState.canScrollForward) {
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            // 计算总条目数（包含 composing）
+                            val itemCount = history.size + if (composing != null) 1 else 0
+                            if (itemCount > 0) {
+                                listState.scrollToBottomEnd()
+                            }
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                ) {
+                    Text("\uD83D\uDC47")
                 }
             }
         }
@@ -134,6 +169,35 @@ fun ModelSelectDropDown(
                     Text(model.name)
                 }
             }
+        }
+    }
+}
+
+// 独立封装的精准滚动到底部方法
+private suspend fun LazyListState.scrollToBottomEnd() {
+    val layoutInfo = layoutInfo
+    val totalItems = layoutInfo.totalItemsCount
+
+    if (totalItems == 0) return
+
+    // 先滚动到最后一个条目顶部
+    animateScrollToItem(totalItems - 1)
+
+    // 等待布局更新
+    delay(16) // 等待一帧时间确保布局稳定
+
+    // 计算需要补充滚动的距离
+    val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
+    lastItem?.let {
+        val itemBottom = it.offset + it.size
+        val viewportBottom = layoutInfo.viewportEndOffset
+        val additionalScroll = itemBottom - viewportBottom
+
+        if (additionalScroll > 0) {
+            animateScrollBy(
+                value = additionalScroll.toFloat(),
+                animationSpec = tween(300)
+            )
         }
     }
 }
