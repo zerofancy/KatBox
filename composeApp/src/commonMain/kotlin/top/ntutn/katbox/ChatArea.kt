@@ -1,8 +1,7 @@
 package top.ntutn.katbox
 
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -89,6 +88,21 @@ fun ChatArea(
             val listState = rememberLazyListState()
             val scope = rememberCoroutineScope() // 获取协程作用域
 
+            var autoScrollEnabled by remember { mutableStateOf(false) }
+
+            LaunchedEffect(listState.isScrollInProgress) {
+                if (listState.isScrollInProgress) {
+                    // 检测到用户手动滚动时关闭自动模式
+                    autoScrollEnabled = false
+                }
+            }
+
+            LaunchedEffect(autoScrollEnabled, listState.canScrollForward) {
+                if (autoScrollEnabled && listState.canScrollForward) {
+                    listState.scrollToBottomEnd()
+                }
+            }
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = listState
@@ -110,11 +124,8 @@ fun ChatArea(
                 OutlinedButton(
                     onClick = {
                         scope.launch {
-                            // 计算总条目数（包含 composing）
-                            val itemCount = history.size + if (composing != null) 1 else 0
-                            if (itemCount > 0) {
-                                listState.scrollToBottomEnd()
-                            }
+                            listState.scrollToBottomEnd()
+                            autoScrollEnabled = true
                         }
                     },
                     modifier = Modifier.align(Alignment.BottomEnd)
@@ -173,31 +184,10 @@ fun ModelSelectDropDown(
     }
 }
 
-// 独立封装的精准滚动到底部方法
 private suspend fun LazyListState.scrollToBottomEnd() {
-    val layoutInfo = layoutInfo
-    val totalItems = layoutInfo.totalItemsCount
-
-    if (totalItems == 0) return
-
-    // 先滚动到最后一个条目顶部
-    animateScrollToItem(totalItems - 1)
-
-    // 等待布局更新
-    delay(16) // 等待一帧时间确保布局稳定
-
-    // 计算需要补充滚动的距离
-    val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
-    lastItem?.let {
-        val itemBottom = it.offset + it.size
-        val viewportBottom = layoutInfo.viewportEndOffset
-        val additionalScroll = itemBottom - viewportBottom
-
-        if (additionalScroll > 0) {
-            animateScrollBy(
-                value = additionalScroll.toFloat(),
-                animationSpec = tween(300)
-            )
+    while (true) {
+        if (scrollBy(10f) < 0.01f) {
+            break
         }
     }
 }
