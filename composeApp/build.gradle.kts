@@ -96,6 +96,7 @@ compose.desktop {
             packageName = "top.ntutn.katbox"
             packageVersion = "1.2.2"
             description = "一个简单的AI聊天前端，可以连接本地Ollama。"
+            vendor = "zerofancy"
 
             windows {
                 iconFile.set(project.file("src/desktopMain/resources/kat-box.ico"))
