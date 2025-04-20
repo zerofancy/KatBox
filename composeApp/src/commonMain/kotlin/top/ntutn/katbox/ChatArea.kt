@@ -180,8 +180,27 @@ fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
             }
 
             if (result.first.isNotEmpty()) {
-                SelectionContainer {
-                    Text(result.first, modifier = Modifier.background(Color.LightGray))
+                var expanded by remember { mutableStateOf(true) }
+                val outputEmpty = result.second.isEmpty()
+                LaunchedEffect(outputEmpty) {
+                    if (!outputEmpty) {
+                        expanded = false
+                    }
+                }
+                TextButton(onClick = { expanded = !expanded }) {
+                    Row {
+                        Text("思考过程")
+                        if (expanded) {
+                            Text("▼")
+                        } else {
+                            Text("▶")
+                        }
+                    }
+                }
+                if (expanded) {
+                    SelectionContainer {
+                        Text(result.first, modifier = Modifier.background(Color.LightGray))
+                    }
                 }
             }
 
