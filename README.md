@@ -2,7 +2,13 @@
 
 ![KatBox](composeApp/src/desktopMain/composeResources/drawable/kat-box.png)
 
-试图使用Compose Multiple Platform实现一个AI聊天界面。
+试图使用Compose Multiplatform实现一个AI聊天界面。
+
+# 项目名称
+
+这是一个尝试使用[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform)模仿[ChatBox](https://github.com/chatboxai/chatbox)的项目，现在还是一个toy project。改C为K也是Kotlin项目命名的传统了，而Cat很可爱是选择这个名字的重要理由。
+
+图标是AI生成的。
 
 # 当前进展
 
