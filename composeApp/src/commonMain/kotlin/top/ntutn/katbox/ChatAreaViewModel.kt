@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import top.ntutn.katbox.logger.slf4jLogger
+import top.ntutn.katbox.logger.loggerFacade
 import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.GenerateRequest
 import top.ntutn.katbox.model.GenerateResponse
@@ -28,7 +28,7 @@ class ChatAreaViewModel : ViewModel() {
     val historyStateFlow: StateFlow<List<ChatMessage>> = _historyStateFlow
     private val _composingMessage = MutableStateFlow<ChatMessage?>(null)
     val composingMessage: StateFlow<ChatMessage?> = _composingMessage
-    private val logger by slf4jLogger("vm")
+    private val logger by loggerFacade("vm")
 
     private val _modelsStateFlow = MutableStateFlow<List<Model>>(emptyList())
     private val _selectedModel = MutableStateFlow<Model?>(null)
@@ -42,7 +42,7 @@ class ChatAreaViewModel : ViewModel() {
         val response = runCatching {
             getPlatform().httpClient.get("http://localhost:11434/api/tags")
         }.onFailure {
-            logger.error("fetch model failed", it)
+            logger.error{ log("fetch model failed", it) }
         }.getOrNull()
         val models = response?.body<OllamaModelsResponse>()
         _modelsStateFlow.value = models?.models ?: emptyList()
@@ -73,7 +73,7 @@ class ChatAreaViewModel : ViewModel() {
             try {
                 generateResponse(value)
             } catch (e: Exception) {
-                logger.error("Generate response failed", e)
+                logger.error{ log("Generate response failed", e) }
             } finally {
                 generateResponseJob = null
             }
@@ -111,7 +111,7 @@ class ChatAreaViewModel : ViewModel() {
         )
         while (!channel.isClosedForRead) {
             val line = channel.readUTF8Line() ?: break
-            logger.debug("received $line")
+            logger.debug { log("received $line") }
             val generateResponse = withContext(Dispatchers.Default) {
                 json.decodeFromString<GenerateResponse>(line)
             }

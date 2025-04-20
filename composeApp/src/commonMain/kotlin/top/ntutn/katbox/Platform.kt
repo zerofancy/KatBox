@@ -11,6 +11,8 @@ interface Platform {
     val httpClientWithoutTimeout: HttpClient
 
     val jsonClient: Json
+
+    fun initLogger()
 }
 
 expect fun getPlatform(): Platform

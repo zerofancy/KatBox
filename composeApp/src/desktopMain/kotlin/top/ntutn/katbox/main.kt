@@ -19,10 +19,12 @@ import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.skiko.hostOs
+import top.ntutn.katbox.logger.LoggerFacade
 
 object App
 
 fun main() = application {
+    LoggerFacade.init(LoggerFacade.VERBOSE)
     CrashAnalysisUtil.plant()
     var visible by remember { mutableStateOf(true) }
     Window(

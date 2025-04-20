@@ -13,9 +13,8 @@ ktorClientCore = "3.1.2"
 lifecycleViewmodelCompose = "2.8.2"
 logbackClassic = "1.5.18"
 multiplatformMarkdownRenderer = "0.33.0"
+napier = "2.7.1"
 open = "8.5.0.4"
-richeditorCompose = "1.0.0-rc11"
-slf4jAndroid = "1.7.36"
 slf4jApi = "2.0.17"
 
 [libraries]
@@ -33,9 +32,8 @@ lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifec
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-code = { module = "com.mikepenz:multiplatform-markdown-renderer-code", version.ref = "multiplatformMarkdownRenderer" }
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 open = { module = "com.vaadin:open", version.ref = "open" }
-richeditor-compose = { module = "com.mohamedrejeb.richeditor:richeditor-compose", version.ref = "richeditorCompose" }
-slf4j-android = { module = "org.slf4j:slf4j-android", version.ref = "slf4jAndroid" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4jApi" }
 
 [plugins]
