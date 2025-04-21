@@ -92,7 +92,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "top.ntutn.katbox"
+            packageName = "KatBox"
             packageVersion = "1.2.2"
             description = "一个简单的AI聊天前端，可以连接本地Ollama。"
             vendor = "zerofancy"
