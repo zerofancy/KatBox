@@ -18,6 +18,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import katbox.composeapp.generated.resources.Res
+import katbox.composeapp.generated.resources.chat_area_send_button
+import org.jetbrains.compose.resources.stringResource
 import top.ntutn.katbox.ChatAreaViewModel
 
 /**
@@ -65,7 +68,7 @@ fun ChatArea(
                 viewModel.sendMessage(inputtingText)
                 inputtingText = ""
             }) {
-                Text("Send")
+                Text(text = stringResource(Res.string.chat_area_send_button))
             }
         }
         LaunchedEffect(Unit) {

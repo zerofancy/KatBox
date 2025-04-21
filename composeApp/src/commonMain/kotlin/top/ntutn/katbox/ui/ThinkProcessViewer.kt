@@ -9,6 +9,9 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import katbox.composeapp.generated.resources.Res
+import katbox.composeapp.generated.resources.chat_aren_think_progress
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * 显示支持推理的大模型的思考过程
@@ -18,7 +21,7 @@ fun ThinkProcessViewer(value: String, expanded: Boolean, modifier: Modifier = Mo
     Column(modifier = modifier) {
         TextButton(onClick = onExpandChange) {
             Row {
-                Text("思考过程")
+                Text(text = stringResource(Res.string.chat_aren_think_progress))
                 if (expanded) {
                     Text("▼")
                 } else {

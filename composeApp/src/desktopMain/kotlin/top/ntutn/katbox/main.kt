@@ -26,9 +26,16 @@ object App
 fun main() = application {
     LoggerFacade.init(LoggerFacade.VERBOSE)
     CrashAnalysisUtil.plant()
+
     var visible by remember { mutableStateOf(true) }
     Window(
-        onCloseRequest = { visible = false},
+        onCloseRequest = {
+            if (!hostOs.isMacOS) {
+                visible = false
+            } else {
+                exitApplication()
+            }
+        },
         title = stringResource(Res.string.app_name),
         icon = painterResource(Res.drawable.kat_box),
         visible = visible,
@@ -64,7 +71,7 @@ fun main() = application {
             },
             primaryActionLinuxLabel = stringResource(Res.string.app_name)
         ) {
-            if (hostOs.isWindows || hostOs.isMacOS) {
+            if (hostOs.isWindows) {
                 Item(label = trayMenuVisibility) {
                     visible = !visible
                 }
