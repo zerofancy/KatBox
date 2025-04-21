@@ -64,7 +64,7 @@ fun main() = application {
             },
             primaryActionLinuxLabel = stringResource(Res.string.app_name)
         ) {
-            if (hostOs.isWindows) {
+            if (hostOs.isWindows || hostOs.isMacOS) {
                 Item(label = trayMenuVisibility) {
                     visible = !visible
                 }
