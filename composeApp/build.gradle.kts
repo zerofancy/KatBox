@@ -42,6 +42,8 @@ kotlin {
             implementation(libs.napier)
             implementation(libs.multiplatform.markdown.renderer)
             implementation(libs.multiplatform.markdown.renderer.code)
+            api(libs.androidx.datastore.preferences.core)
+            api(libs.androidx.datastore.core.okio)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

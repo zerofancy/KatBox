@@ -15,19 +15,24 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import katbox.composeapp.generated.resources.Res
 import katbox.composeapp.generated.resources.chat_area_send_button
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import top.ntutn.katbox.ChatAreaViewModel
+import top.ntutn.katbox.storage.ConnectionDataStore
+import top.ntutn.katbox.storage.Factory
 
 /**
  * 与大模型对话的主要对话页面
  */
 @Composable
 fun ChatArea(
+    factory: Factory,
     modifier: Modifier = Modifier,
     viewModel: ChatAreaViewModel = viewModel { ChatAreaViewModel() }
 ) {
@@ -64,9 +69,15 @@ fun ChatArea(
             val models by viewModel.modelsStateFlow.collectAsState()
             val selectedModel by viewModel.selectedModel.collectAsState()
             ModelSelectDropDown(models, selectedModel, onSelectModel = viewModel::selectModel)
+            val scope = rememberCoroutineScope()
             Button(enabled = inputtingText.isNotBlank(), onClick = {
                 viewModel.sendMessage(inputtingText)
                 inputtingText = ""
+                val dataStore: ConnectionDataStore = factory.createConnectionDataStore()
+                scope.launch {
+                    dataStore.update()
+                }
+
             }) {
                 Text(text = stringResource(Res.string.chat_area_send_button))
             }

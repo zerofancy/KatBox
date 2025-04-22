@@ -16,6 +16,7 @@ multiplatformMarkdownRenderer = "0.33.0"
 napier = "2.7.1"
 open = "8.5.0.4"
 slf4jApi = "2.0.17"
+dataStore = "1.1.4"
 
 [libraries]
 composenativetray = { module = "io.github.kdroidfilter:composenativetray", version.ref = "composenativetray" }
@@ -35,6 +36,8 @@ multiplatform-markdown-renderer-code = { module = "com.mikepenz:multiplatform-ma
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 open = { module = "com.vaadin:open", version.ref = "open" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4jApi" }
+androidx-datastore-core-okio = { group = "androidx.datastore", name = "datastore-core-okio", version.ref = "dataStore" }
+androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "dataStore" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
