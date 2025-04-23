@@ -1,4 +1,4 @@
-package top.ntutn.katbox.ui
+package top.ntutn.katbox.ui.chatscene
 
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box

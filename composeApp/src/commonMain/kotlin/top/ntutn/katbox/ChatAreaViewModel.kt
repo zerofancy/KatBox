@@ -23,7 +23,7 @@ import top.ntutn.katbox.model.GenerateResponse
 import top.ntutn.katbox.model.Model
 import top.ntutn.katbox.model.OllamaModelsResponse
 
-class ChatAreaViewModel : ViewModel() {
+class ChatAreaViewModel() : ViewModel() {
     private val _historyStateFlow = MutableStateFlow(listOf<ChatMessage>())
     val historyStateFlow: StateFlow<List<ChatMessage>> = _historyStateFlow
     private val _composingMessage = MutableStateFlow<ChatMessage?>(null)

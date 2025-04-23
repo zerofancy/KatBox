@@ -1,4 +1,4 @@
-package top.ntutn.katbox.ui
+package top.ntutn.katbox.ui.chatscene
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
