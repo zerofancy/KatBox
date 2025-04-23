@@ -51,8 +51,5 @@ fun ChatScene(
                 onSendMessage = viewModel::sendMessage
             )
         }
-        LaunchedEffect(Unit) {
-            viewModel.fetchModels()
-        }
     }
 }

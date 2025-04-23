@@ -6,7 +6,7 @@ import okio.BufferedSource
 import top.ntutn.katbox.getPlatform
 
 object ConnectionSerializer: OkioSerializer<ConnectionModel> {
-    override val defaultValue: ConnectionModel = ConnectionModel("http://localhost:11434", 0)
+    override val defaultValue: ConnectionModel = ConnectionModel("http://localhost:11434")
 
     override suspend fun readFrom(source: BufferedSource): ConnectionModel {
         return getPlatform().jsonClient.decodeFromString(source.readUtf8())

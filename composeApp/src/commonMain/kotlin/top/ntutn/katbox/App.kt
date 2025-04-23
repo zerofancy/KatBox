@@ -16,10 +16,11 @@ import top.ntutn.katbox.ui.SettingScene
 @Composable
 fun App(factory: Factory) {
     MaterialTheme {
-        val viewModel = viewModel { ChatAreaViewModel() }
+        val dataStore = remember(factory) { factory.createConnectionDataStore() }
+        val viewModel = viewModel { ChatAreaViewModel(dataStore) }
         var settingOpen by remember { mutableStateOf(false) }
         if (settingOpen) {
-            SettingScene {
+            SettingScene(dataStore) {
                 settingOpen = false
             }
         } else {

@@ -2,18 +2,23 @@ package top.ntutn.katbox
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.preparePost
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.URLBuilder
 import io.ktor.http.contentType
+import io.ktor.http.path
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import top.ntutn.katbox.logger.loggerFacade
@@ -22,8 +27,9 @@ import top.ntutn.katbox.model.GenerateRequest
 import top.ntutn.katbox.model.GenerateResponse
 import top.ntutn.katbox.model.Model
 import top.ntutn.katbox.model.OllamaModelsResponse
+import top.ntutn.katbox.storage.ConnectionDataStore
 
-class ChatAreaViewModel() : ViewModel() {
+class ChatAreaViewModel(private val dataStore: ConnectionDataStore) : ViewModel() {
     private val _historyStateFlow = MutableStateFlow(listOf<ChatMessage>())
     val historyStateFlow: StateFlow<List<ChatMessage>> = _historyStateFlow
     private val _composingMessage = MutableStateFlow<ChatMessage?>(null)
@@ -37,10 +43,26 @@ class ChatAreaViewModel() : ViewModel() {
 
     private var generateResponseJob: Job? = null
     private var generateContext: List<Int>? = null
+    private var baseUrl = "http://localhost:11434"
 
-    fun fetchModels() = viewModelScope.launch {
+    init {
+        dataStore.connectionData().onEach {
+            if (it.url != baseUrl) {
+                baseUrl = it.url
+                fetchModels()
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun fetchModels() = viewModelScope.launch {
+        val url = runCatching {
+            URLBuilder(baseUrl).apply {
+                path("api/tags")
+            }.buildString()
+        }.getOrNull()
         val response = runCatching {
-            getPlatform().httpClient.get("http://localhost:11434/api/tags")
+            require(url != null)
+            getPlatform().httpClient.get(url)
         }.onFailure {
             logger.error{ log("fetch model failed", it) }
         }.getOrNull()
@@ -97,7 +119,12 @@ class ChatAreaViewModel() : ViewModel() {
             true,
             generateContext
         )
-        val statement = getPlatform().httpClientWithoutTimeout.preparePost("http://localhost:11434/api/generate") {
+        val url = runCatching {
+            URLBuilder(baseUrl).apply {
+                path("api/generate")
+            }.buildString()
+        }.getOrNull() ?: return
+        val statement = getPlatform().httpClientWithoutTimeout.preparePost(url) {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
