@@ -29,7 +29,7 @@ import top.ntutn.katbox.model.Model
 import top.ntutn.katbox.model.OllamaModelsResponse
 import top.ntutn.katbox.storage.ConnectionDataStore
 
-class ChatAreaViewModel(private val dataStore: ConnectionDataStore) : ViewModel() {
+class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
     private val _historyStateFlow = MutableStateFlow(listOf<ChatMessage>())
     val historyStateFlow: StateFlow<List<ChatMessage>> = _historyStateFlow
     private val _composingMessage = MutableStateFlow<ChatMessage?>(null)
@@ -43,7 +43,7 @@ class ChatAreaViewModel(private val dataStore: ConnectionDataStore) : ViewModel(
 
     private var generateResponseJob: Job? = null
     private var generateContext: List<Int>? = null
-    private var baseUrl = "http://localhost:11434"
+    private var baseUrl = ""
 
     init {
         dataStore.connectionData().onEach {
