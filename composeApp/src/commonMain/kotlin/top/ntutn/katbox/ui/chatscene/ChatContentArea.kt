@@ -20,7 +20,12 @@ fun ChatContentArea(
             modifier = Modifier.Companion.fillMaxSize(),
             state = listState
         ) {
-            items(history.size) { i ->
+            items(
+                history.size,
+                key = {
+                    history[it].uuid
+                }
+            ) { i ->
                 val item = history[i]
                 MessageLine(message = item)
             }
