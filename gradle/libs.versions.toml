@@ -8,7 +8,7 @@ androidx-lifecycle = "2.8.4"
 compose-multiplatform = "1.7.3"
 composenativetray = "0.5.5"
 kotlin = "2.1.20"
-kotlinx-coroutines = "1.10.1"
+kotlinx-coroutines = "1.10.2"
 ktorClientCore = "3.1.2"
 lifecycleViewmodelCompose = "2.8.2"
 logbackClassic = "1.5.18"
@@ -45,3 +45,4 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
