@@ -7,6 +7,14 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.buildconfig)
+}
+
+version = "1.2.2"
+
+buildConfig {
+    buildConfigField("String", "APP_NAME", "\"${project.name}\"")
+    buildConfigField("String", "APP_VERSION", "\"${version}\"")
 }
 
 kotlin {
@@ -95,7 +103,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "KatBox"
-            packageVersion = "1.2.2"
+            packageVersion = version.toString()
             description = "一个简单的AI聊天前端，可以连接本地Ollama。"
             vendor = "zerofancy"
 
