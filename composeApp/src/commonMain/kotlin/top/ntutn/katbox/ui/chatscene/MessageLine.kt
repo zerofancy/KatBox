@@ -72,7 +72,10 @@ fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
                         expanded = false
                     }
                 }
-                ThinkProcessViewer(value = result.first, expanded = expanded, onExpandChange = { expanded = !expanded })
+                ThinkProcessViewer(
+                    value = result.first, expanded = expanded,
+                    modifier = Modifier.fillMaxWidth(),
+                    onExpandChange = { expanded = !expanded })
             }
 
             // 避免上下跳动思路：延迟父布局高度变化
