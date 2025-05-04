@@ -32,64 +32,64 @@ fun main() {
         LoggerFacade.init(LoggerFacade.VERBOSE)
         CrashAnalysisUtil.plant()
 
-        var visible by remember { mutableStateOf(true) }
+//        var visible by remember { mutableStateOf(true) }
         Window(
             onCloseRequest = {
-                if (!hostOs.isMacOS) {
-                    visible = false
-                } else {
+//                if (!hostOs.isMacOS) {
+//                    visible = false
+//                } else {
                     exitApplication()
-                }
+//                }
             },
             title = stringResource(Res.string.app_name),
             icon = painterResource(Res.drawable.kat_box),
-            visible = visible,
+//            visible = visible,
         ) {
             App(App.factory)
         }
 
-        val iconPath = App.javaClass.classLoader!!.getResource("kat-box.png")!!.path
-        val windowsIconPath = App.javaClass.classLoader!!.getResource("kat-box.ico")!!.path
-
-        var trayResourceLoaded by remember { mutableStateOf(false) }
-        var trayMenuVisibility by remember { mutableStateOf("") }
-        var trayMenuAbout by remember { mutableStateOf("") }
-        var trayMenuExit by remember { mutableStateOf("") }
-
-        LaunchedEffect(Unit) {
-            trayMenuVisibility = getString(Res.string.tray_menu_show_hide)
-            trayMenuAbout = getString(Res.string.tray_menu_about)
-            trayMenuExit = getString(Res.string.tray_menu_exit)
-
-            trayResourceLoaded = true
-        }
-
-        if (trayResourceLoaded) {
-            Tray(
-                iconPath = iconPath,
-                windowsIconPath = windowsIconPath,
-                tooltip = stringResource(Res.string.app_name),
-                primaryAction = {
-                    if (!hostOs.isMacOS) {
-                        visible = !visible
-                    }
-                },
-                primaryActionLinuxLabel = stringResource(Res.string.app_name)
-            ) {
-                if (hostOs.isWindows) {
-                    Item(label = trayMenuVisibility) {
-                        visible = !visible
-                    }
-                    Divider()
-                }
-                Item(label = trayMenuAbout) {
-                    Open.open("https://github.com/zerofancy/KatBox")
-                }
-                Item(label = trayMenuExit, isEnabled = true) {
-                    dispose()
-                    exitApplication()
-                }
-            }
-        }
+//        val iconPath = App.javaClass.classLoader!!.getResource("kat-box.png")!!.path
+//        val windowsIconPath = App.javaClass.classLoader!!.getResource("kat-box.ico")!!.path
+//
+//        var trayResourceLoaded by remember { mutableStateOf(false) }
+//        var trayMenuVisibility by remember { mutableStateOf("") }
+//        var trayMenuAbout by remember { mutableStateOf("") }
+//        var trayMenuExit by remember { mutableStateOf("") }
+//
+//        LaunchedEffect(Unit) {
+//            trayMenuVisibility = getString(Res.string.tray_menu_show_hide)
+//            trayMenuAbout = getString(Res.string.tray_menu_about)
+//            trayMenuExit = getString(Res.string.tray_menu_exit)
+//
+//            trayResourceLoaded = true
+//        }
+//
+//        if (trayResourceLoaded) {
+//            Tray(
+//                iconPath = iconPath,
+//                windowsIconPath = windowsIconPath,
+//                tooltip = stringResource(Res.string.app_name),
+//                primaryAction = {
+//                    if (!hostOs.isMacOS) {
+//                        visible = !visible
+//                    }
+//                },
+//                primaryActionLinuxLabel = stringResource(Res.string.app_name)
+//            ) {
+//                if (hostOs.isWindows) {
+//                    Item(label = trayMenuVisibility) {
+//                        visible = !visible
+//                    }
+//                    Divider()
+//                }
+//                Item(label = trayMenuAbout) {
+//                    Open.open("https://github.com/zerofancy/KatBox")
+//                }
+//                Item(label = trayMenuExit, isEnabled = true) {
+//                    dispose()
+//                    exitApplication()
+//                }
+//            }
+//        }
     }
 }
