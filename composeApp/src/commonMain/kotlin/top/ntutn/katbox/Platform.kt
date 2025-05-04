@@ -13,6 +13,8 @@ interface Platform {
     val jsonClient: Json
 
     fun initLogger()
+
+    fun openAbout()
 }
 
 expect fun getPlatform(): Platform

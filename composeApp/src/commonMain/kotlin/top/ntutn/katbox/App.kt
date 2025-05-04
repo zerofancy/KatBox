@@ -26,6 +26,8 @@ fun App(factory: Factory) {
         } else {
             ChatScene(viewModel, Modifier.fillMaxSize(), onOpenSetting = {
                 settingOpen = true
+            }, onOpenAbout = {
+                getPlatform().openAbout()
             })
         }
     }

@@ -17,6 +17,10 @@ class AndroidPlatform : Platform {
     override fun initLogger() {
         Napier.base(DebugAntilog())
     }
+
+    override fun openAbout() {
+        TODO("Not yet implemented")
+    }
 }
 
 actual fun getPlatform(): Platform = AndroidPlatform()

@@ -1,5 +1,6 @@
 package top.ntutn.katbox
 
+import com.vaadin.open.Open
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
@@ -35,6 +36,10 @@ class JVMPlatform: Platform {
             socketTimeoutMillis = Long.MAX_VALUE
             connectTimeoutMillis = Long.MAX_VALUE
         }
+    }
+
+    override fun openAbout() {
+        Open.open("https://github.com/zerofancy/KatBox")
     }
 }
 

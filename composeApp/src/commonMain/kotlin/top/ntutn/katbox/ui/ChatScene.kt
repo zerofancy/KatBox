@@ -32,7 +32,8 @@ import top.ntutn.katbox.ui.chatscene.InputtingArea
 fun ChatScene(
     viewModel: ChatAreaViewModel,
     modifier: Modifier = Modifier,
-    onOpenSetting: () -> Unit = {}
+    onOpenSetting: () -> Unit = {},
+    onOpenAbout: () -> Unit = {},
 ) {
     Row(modifier) {
         var menuVisibility by remember { mutableStateOf(false) }
@@ -44,6 +45,9 @@ fun ChatScene(
                         }
                     Button(onClick = onOpenSetting) {
                         Text("Setting")
+                    }
+                    Button(onClick = onOpenAbout) {
+                        Text("About")
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Text(text = "version: " + BuildConfig.APP_VERSION)
