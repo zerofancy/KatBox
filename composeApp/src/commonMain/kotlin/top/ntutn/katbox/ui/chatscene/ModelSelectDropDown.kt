@@ -14,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import top.ntutn.katbox.model.Model
+import top.ntutn.katbox.model.ollama.Model
 import kotlin.collections.forEach
 
 /**
@@ -22,16 +22,16 @@ import kotlin.collections.forEach
  */
 @Composable
 fun ModelSelectDropDown(
-    models: List<Model>,
-    selectedModel: Model?,
+    models: List<String>,
+    selectedModel: String?,
     modifier: Modifier = Modifier,
-    onSelectModel: (Model) -> Unit
+    onSelectModel: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
         TextButton(onClick = { expanded = true }) {
-            Text(selectedModel?.name ?: "null")
+            Text(selectedModel ?: "null")
         }
         DropdownMenu(expanded = expanded, onDismissRequest = {
             expanded = false
@@ -41,7 +41,7 @@ fun ModelSelectDropDown(
                     onSelectModel(model)
                     expanded = false
                 }) {
-                    Text(model.name)
+                    Text(model)
                 }
             }
         }

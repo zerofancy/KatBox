@@ -2,31 +2,18 @@ package top.ntutn.katbox
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.preparePost
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.URLBuilder
-import io.ktor.http.contentType
-import io.ktor.http.path
-import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.readUTF8Line
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import top.ntutn.katbox.logger.loggerFacade
 import top.ntutn.katbox.model.ChatMessage
-import top.ntutn.katbox.model.GenerateRequest
-import top.ntutn.katbox.model.GenerateResponse
-import top.ntutn.katbox.model.Model
-import top.ntutn.katbox.model.OllamaModelsResponse
+import top.ntutn.katbox.model.ChatSessionProvider
+import top.ntutn.katbox.model.OllamaSessionProvider
 import top.ntutn.katbox.storage.ConnectionDataStore
 
 class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
@@ -36,43 +23,41 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
     val composingMessage: StateFlow<ChatMessage?> = _composingMessage
     private val logger by loggerFacade("vm")
 
-    private val _modelsStateFlow = MutableStateFlow<List<Model>>(emptyList())
-    private val _selectedModel = MutableStateFlow<Model?>(null)
-    val selectedModel: StateFlow<Model?> = _selectedModel
-    val modelsStateFlow: StateFlow<List<Model>> = _modelsStateFlow
+    private val _modelsStateFlow = MutableStateFlow<List<String>>(emptyList())
+    private val _selectedModel = MutableStateFlow<String?>(null)
+    val selectedModel: StateFlow<String?> = _selectedModel
+    val modelsStateFlow: StateFlow<List<String>> = _modelsStateFlow
 
-    private var generateResponseJob: Job? = null
     private var generateContext: List<Int>? = null
     private var baseUrl = ""
+    private var provider: ChatSessionProvider? = null
+    private var providerScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 
     init {
         dataStore.connectionData().onEach {
             if (it.url != baseUrl) {
                 baseUrl = it.url
-                fetchModels()
+                bindProvider(OllamaSessionProvider(it.url))
             }
         }.launchIn(viewModelScope)
     }
 
-    private fun fetchModels() = viewModelScope.launch {
-        val url = runCatching {
-            URLBuilder(baseUrl).apply {
-                path("api/tags")
-            }.buildString()
-        }.getOrNull()
-        val response = runCatching {
-            require(url != null)
-            getPlatform().httpClient.get(url)
-        }.onFailure {
-            logger.error{ log("fetch model failed", it) }
-        }.getOrNull()
-        val models = response?.body<OllamaModelsResponse>()
-        _modelsStateFlow.value = models?.models ?: emptyList()
-        _selectedModel.value = models?.models?.firstOrNull()
-        generateContext = null
+    private fun bindProvider(newProvider: ChatSessionProvider) {
+        providerScope.cancel()
+        providerScope = CoroutineScope(Dispatchers.Default)
+        provider = newProvider
+        newProvider.modelsFlow().onEach {
+            _modelsStateFlow.value = it
+        }.launchIn(providerScope)
+        newProvider.selectedModelFlow().onEach {
+            _selectedModel.value = it
+        }.launchIn(providerScope)
+        providerScope.launch {
+            provider?.listModels()
+        }
     }
 
-    fun selectModel(model: Model) = viewModelScope.launch {
+    fun selectModel(model: String) = viewModelScope.launch {
         if (model != _selectedModel.value) {
             generateContext = null
             _selectedModel.value = model
@@ -80,7 +65,6 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
     }
 
     fun sendMessage(value: String) = viewModelScope.launch {
-        generateResponseJob?.cancel()
         composingMessage.value?.let {
             _historyStateFlow.value += it
         }
@@ -91,64 +75,22 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
             role = "User",
             completed = true
         )
-        generateResponseJob = viewModelScope.launch {
-            try {
-                generateResponse(value)
-            } catch (e: Exception) {
-                logger.error{ log("Generate response failed", e) }
-            } finally {
-                generateResponseJob = null
-            }
-        }
-    }
-
-    private suspend fun generateResponse(value: String) {
-        val selectedModel = selectedModel.value
-        if (selectedModel == null) {
-            _composingMessage.value = ChatMessage(
-                timestamp = System.currentTimeMillis(),
-                text = "No Selected Model",
-                role = "System",
-                completed = true
-            )
-            return
-        }
-        val request = GenerateRequest(
-            model = selectedModel.name,
-            value,
-            true,
-            generateContext
-        )
-        val url = runCatching {
-            URLBuilder(baseUrl).apply {
-                path("api/generate")
-            }.buildString()
-        }.getOrNull() ?: return
-        val statement = getPlatform().httpClientWithoutTimeout.preparePost(url) {
-            contentType(ContentType.Application.Json)
-            setBody(request)
-        }
-        val channel = statement.body<ByteReadChannel>()
-        val json = getPlatform().jsonClient
         _composingMessage.value = ChatMessage(
             timestamp = System.currentTimeMillis(),
             text = "",
             role = "Assistant",
             completed = false
         )
-        while (!channel.isClosedForRead) {
-            val line = channel.readUTF8Line() ?: break
-            logger.debug { log("received $line") }
-            val generateResponse = withContext(Dispatchers.Default) {
-                json.decodeFromString<GenerateResponse>(line)
-            }
-            _composingMessage.value = _composingMessage.value?.let {
-                it.copy(text = it.text + generateResponse.response)
-            }
-            generateResponse.context?.let {
-                generateContext = it
-            }
+        provider?.chatWithModel("", value)?.collect {
+            _composingMessage.value = _composingMessage.value?.copy(
+                text = (_composingMessage.value?.text ?: "") + it
+            )
         }
         _composingMessage.value = _composingMessage.value?.copy(completed = true)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        providerScope.cancel()
     }
 }

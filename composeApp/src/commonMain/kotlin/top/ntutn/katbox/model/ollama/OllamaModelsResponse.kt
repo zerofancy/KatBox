@@ -1,4 +1,4 @@
-package top.ntutn.katbox.model
+package top.ntutn.katbox.model.ollama
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

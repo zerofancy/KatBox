@@ -14,14 +14,14 @@ import androidx.compose.ui.Modifier
 import katbox.composeapp.generated.resources.Res
 import katbox.composeapp.generated.resources.chat_area_send_button
 import org.jetbrains.compose.resources.stringResource
-import top.ntutn.katbox.model.Model
+import top.ntutn.katbox.model.ollama.Model
 
 @Composable
 fun InputtingArea(
-    models: List<Model>,
-    selectedModel: Model?,
+    models: List<String>,
+    selectedModel: String?,
     modifier: Modifier = Modifier.Companion,
-    onSelectModel: (Model) -> Unit = {},
+    onSelectModel: (String) -> Unit = {},
     onSendMessage: (String) -> Unit
 ) {
     Row(modifier = modifier.fillMaxWidth()) {
