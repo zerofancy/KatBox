@@ -47,7 +47,10 @@ fun MarkdownViewer(markdown: String, modifier: Modifier = Modifier) {
     }
     SelectionContainer {
         Markdown(
-            markdownState = rememberMarkdownState(markdown),
+            markdownState = rememberMarkdownState(
+                content = markdown,
+                immediate = true
+            ),
             colors = markdownColor(),
             typography = markdownTypography(),
             components = markdownComponents(

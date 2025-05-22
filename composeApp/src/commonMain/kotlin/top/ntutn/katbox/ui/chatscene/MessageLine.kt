@@ -77,28 +77,7 @@ fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxWidth(),
                     onExpandChange = { expanded = !expanded })
             }
-
-            // 避免上下跳动思路：延迟父布局高度变化
-            StableMarkdownContainer {
-                if (!message.completed) {
-                    val index = result.second.indexOfLast {
-                        it == '\n'
-                    }
-                    if (index in result.second.indices) {
-                        val first = result.second.substring(0, index)
-                        val second = result.second.substring(index, result.second.length)
-                        Column {
-                            // 避免闪烁思路：拆分出最后一个自然段，这样就算闪烁也只有最后一个段落
-                            MarkdownViewer(first)
-                            MarkdownViewer(second)
-                        }
-                    } else {
-                        MarkdownViewer(result.second)
-                    }
-                } else {
-                    MarkdownViewer(result.second)
-                }
-            }
+            MarkdownViewer(result.second)
         }
     }
 }
