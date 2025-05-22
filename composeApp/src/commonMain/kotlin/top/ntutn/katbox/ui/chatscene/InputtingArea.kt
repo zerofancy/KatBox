@@ -2,9 +2,9 @@ package top.ntutn.katbox.ui.chatscene
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import katbox.composeapp.generated.resources.Res
 import katbox.composeapp.generated.resources.chat_area_send_button
 import org.jetbrains.compose.resources.stringResource
-import top.ntutn.katbox.model.ollama.Model
 
 @Composable
 fun InputtingArea(

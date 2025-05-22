@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,7 +38,7 @@ fun ChatScene(
     Row(modifier) {
         var menuVisibility by remember { mutableStateOf(false) }
         if (menuVisibility) {
-            Surface(elevation = 4.dp) {
+            Surface(shadowElevation = 4.dp) {
                 Column(modifier = Modifier.fillMaxHeight()) {
                         OutlinedButton(onClick = { menuVisibility = false }) {
                             Text(stringResource(Res.string.app_name))
@@ -56,7 +56,7 @@ fun ChatScene(
         }
         Column {
             if (!menuVisibility) {
-                Surface(elevation = 4.dp) {
+                Surface(shadowElevation = 4.dp) {
                     Row(Modifier.fillMaxWidth()) {
                         OutlinedButton(onClick = { menuVisibility = true }) {
                             Text(stringResource(Res.string.app_name))
@@ -69,7 +69,7 @@ fun ChatScene(
             val composing by viewModel.composingMessage.collectAsState()
 
             ChatContentArea(history, composing, Modifier.weight(1f))
-            Surface(elevation = 4.dp) {
+            Surface(shadowElevation = 4.dp) {
                 val models by viewModel.modelsStateFlow.collectAsState()
                 val selectedModel by viewModel.selectedModel.collectAsState()
                 InputtingArea(

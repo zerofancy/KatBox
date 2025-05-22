@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -89,11 +89,11 @@ fun MarkdownViewer(markdown: String, modifier: Modifier = Modifier) {
 
 @Composable
 private fun markdownColor(
-    text: Color = MaterialTheme.colors.onBackground,
-    codeBackground: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
+    text: Color = MaterialTheme.colorScheme.onBackground,
+    codeBackground: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f),
     inlineCodeBackground: Color = codeBackground,
-    dividerColor: Color = MaterialTheme.colors.secondaryVariant,
-    tableBackground: Color = MaterialTheme.colors.onBackground.copy(alpha = 0.02f),
+    dividerColor: Color = MaterialTheme.colorScheme.onSecondary,
+    tableBackground: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.02f),
 ): MarkdownColors = DefaultMarkdownColors(
     text = text,
     codeText = Color.Unspecified,
@@ -109,21 +109,21 @@ private fun markdownColor(
 
 @Composable
 private fun markdownTypography(
-    h1: TextStyle = MaterialTheme.typography.h1,
-    h2: TextStyle = MaterialTheme.typography.h2,
-    h3: TextStyle = MaterialTheme.typography.h3,
-    h4: TextStyle = MaterialTheme.typography.h4,
-    h5: TextStyle = MaterialTheme.typography.h5,
-    h6: TextStyle = MaterialTheme.typography.h6,
-    text: TextStyle = MaterialTheme.typography.body1,
-    code: TextStyle = MaterialTheme.typography.body1.copy(fontFamily = FontFamily.Monospace),
+    h1: TextStyle = MaterialTheme.typography.headlineLarge,
+    h2: TextStyle = MaterialTheme.typography.headlineMedium,
+    h3: TextStyle = MaterialTheme.typography.headlineSmall,
+    h4: TextStyle = MaterialTheme.typography.headlineSmall,
+    h5: TextStyle = MaterialTheme.typography.headlineSmall,
+    h6: TextStyle = MaterialTheme.typography.headlineSmall,
+    text: TextStyle = MaterialTheme.typography.bodyMedium,
+    code: TextStyle = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace),
     inlineCode: TextStyle = text.copy(fontFamily = FontFamily.Monospace),
-    quote: TextStyle = MaterialTheme.typography.body2.plus(SpanStyle(fontStyle = FontStyle.Italic)),
-    paragraph: TextStyle = MaterialTheme.typography.body1,
-    ordered: TextStyle = MaterialTheme.typography.body1,
-    bullet: TextStyle = MaterialTheme.typography.body1,
-    list: TextStyle = MaterialTheme.typography.body1,
-    link: TextStyle = MaterialTheme.typography.body1.copy(
+    quote: TextStyle = MaterialTheme.typography.bodySmall.plus(SpanStyle(fontStyle = FontStyle.Italic)),
+    paragraph: TextStyle = MaterialTheme.typography.bodyMedium,
+    ordered: TextStyle = MaterialTheme.typography.bodyMedium,
+    bullet: TextStyle = MaterialTheme.typography.bodyMedium,
+    list: TextStyle = MaterialTheme.typography.bodyMedium,
+    link: TextStyle = MaterialTheme.typography.bodyMedium.copy(
         fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline
     ),
     textLink: TextLinkStyles = TextLinkStyles(style = link.toSpanStyle()),
