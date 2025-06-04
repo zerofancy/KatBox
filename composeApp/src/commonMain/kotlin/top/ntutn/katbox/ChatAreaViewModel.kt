@@ -13,7 +13,8 @@ import kotlinx.coroutines.launch
 import top.ntutn.katbox.logger.loggerFacade
 import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.ChatSessionProvider
-import top.ntutn.katbox.model.OllamaSessionProvider
+import top.ntutn.katbox.model.deepseek.DeepseekSessionProvider
+import top.ntutn.katbox.model.ollama.OllamaSessionProvider
 import top.ntutn.katbox.storage.ConnectionDataStore
 
 class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
@@ -38,6 +39,7 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
             if (it.url != baseUrl) {
                 baseUrl = it.url
                 bindProvider(OllamaSessionProvider(it.url))
+//                bindProvider(DeepseekSessionProvider("TODO"))
             }
         }.launchIn(viewModelScope)
     }

@@ -7,6 +7,7 @@ androidx-activityCompose = "1.10.1"
 androidx-lifecycle = "2.9.0"
 compose-multiplatform = "1.8.1"
 composenativetray = "0.6.0"
+deepseekKotlin = "0.3.1"
 kotlin = "2.1.21"
 kotlinx-coroutines = "1.10.2"
 ktorClientCore = "3.1.2"
@@ -24,6 +25,7 @@ composenativetray = { module = "io.github.kdroidfilter:composenativetray", versi
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+deepseek-kotlin = { module = "org.oremif:deepseek-kotlin", version.ref = "deepseekKotlin" }
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktorClientCore" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientCore" }

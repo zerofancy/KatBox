@@ -52,6 +52,7 @@ kotlin {
             implementation(libs.multiplatform.markdown.renderer.code)
             api(libs.androidx.datastore.preferences.core)
             api(libs.androidx.datastore.core.okio)
+            implementation(libs.deepseek.kotlin)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

@@ -1,4 +1,4 @@
-package top.ntutn.katbox.model
+package top.ntutn.katbox.model.ollama
 
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -20,10 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import top.ntutn.katbox.getPlatform
 import top.ntutn.katbox.logger.loggerFacade
-import top.ntutn.katbox.model.ollama.GenerateRequest
-import top.ntutn.katbox.model.ollama.GenerateResponse
-import top.ntutn.katbox.model.ollama.Model
-import top.ntutn.katbox.model.ollama.OllamaModelsResponse
+import top.ntutn.katbox.model.ChatSessionProvider
 
 class OllamaSessionProvider(private val baseUrl: String): ChatSessionProvider {
     private val models = MutableStateFlow(listOf<Model>())
@@ -59,14 +56,14 @@ class OllamaSessionProvider(private val baseUrl: String): ChatSessionProvider {
         selectedModel.value = models.value.find { it.name == modelName }
     }
 
-    override fun chatWithModel(
+    override suspend fun chatWithModel(
         prompt: String,
         content: String
     ): Flow<String> {
-        val currentModelName = selectedModel.value?.name ?: return flow {  }
+        val currentModelName = selectedModel.value?.name ?: return flow { }
         val models = models.value
         if (models.find { it.name == currentModelName } == null) {
-            return flow {  }
+            return flow { }
         }
         return generateResponseFlow(currentModelName, content)
     }
