@@ -38,8 +38,8 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
         dataStore.connectionData().onEach {
             if (it.url != baseUrl) {
                 baseUrl = it.url
-                bindProvider(OllamaSessionProvider(it.url))
-//                bindProvider(DeepseekSessionProvider("TODO"))
+//                bindProvider(OllamaSessionProvider(it.url))
+                bindProvider(DeepseekSessionProvider("TODO"))
             }
         }.launchIn(viewModelScope)
     }

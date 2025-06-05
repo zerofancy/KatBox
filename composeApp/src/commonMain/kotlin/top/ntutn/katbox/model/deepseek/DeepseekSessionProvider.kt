@@ -8,9 +8,10 @@ import org.oremif.deepseek.api.chat
 import org.oremif.deepseek.api.models
 import org.oremif.deepseek.client.DeepSeekClientStream
 import org.oremif.deepseek.models.ModelInfo
+import org.oremif.deepseek.models.chatCompletionStreamParams
 import top.ntutn.katbox.model.ChatSessionProvider
 
-class DeepseekSessionProvider(apiKey: String): ChatSessionProvider {
+class DeepseekSessionProvider(apiKey: String) : ChatSessionProvider {
     private val client = DeepSeekClientStream(apiKey)
     private val modelsFlow = MutableStateFlow<List<ModelInfo>>(listOf())
     private val currentFlow = MutableStateFlow<ModelInfo?>(null)
@@ -37,9 +38,15 @@ class DeepseekSessionProvider(apiKey: String): ChatSessionProvider {
         prompt: String,
         content: String
     ): Flow<String> {
-        return client.chat(content)
-            .map {
-                it.choices.joinToString("") { it.delta.content ?: "" }
-            }
+        val params = chatCompletionStreamParams {
+            temperature = 0.7
+            maxTokens = 1000
+        }
+        return client.chat(params) { // todo deepseek api无状态，需要发送历史
+            system(prompt)
+            user(content)
+        }.map {
+            it.choices.joinToString("") { it.delta.content ?: "" }
+        }
     }
 }
