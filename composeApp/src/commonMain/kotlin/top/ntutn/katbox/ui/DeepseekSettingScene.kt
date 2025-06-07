@@ -9,7 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers
 import top.ntutn.katbox.DeepseekSettingSceneVM
@@ -23,7 +25,8 @@ fun DeepseekSettingScene(dataStore: ConnectionDataStore, modifier: Modifier = Mo
         Row {
             Text("key")
             val url by viewModel.inputtingKey.collectAsState(Dispatchers.Main.immediate)
-            TextField(value = url, onValueChange = viewModel::onInputChange)
+            val transformation = remember { PasswordVisualTransformation() }
+            TextField(value = url, onValueChange = viewModel::onInputChange, visualTransformation = transformation)
         }
         Row {
             Button(onClick = onCloseSetting) {
