@@ -15,7 +15,11 @@ import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.ChatSessionProvider
 import top.ntutn.katbox.model.Role
 import top.ntutn.katbox.model.deepseek.DeepseekSessionProvider
+import top.ntutn.katbox.model.ollama.OllamaSessionProvider
 import top.ntutn.katbox.storage.ConnectionDataStore
+import top.ntutn.katbox.storage.DeepseekModelSetting
+import top.ntutn.katbox.storage.ModelType
+import top.ntutn.katbox.storage.OllamaModelSetting
 
 class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
     private val _historyStateFlow = MutableStateFlow(listOf<ChatMessage>())
@@ -36,10 +40,20 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
 
     init {
         dataStore.connectionData().onEach {
-            if (it.url != baseUrl) {
-                baseUrl = it.url
-//                bindProvider(OllamaSessionProvider(it.url))
-                bindProvider(DeepseekSessionProvider(""))
+            if (it.type == ModelType.OLLAMA) {
+                bindProvider(
+                    OllamaSessionProvider(
+                        it.settingMap[ModelType.OLLAMA]?.let { it as? OllamaModelSetting }?.url
+                            ?: ""
+                    )
+                )
+            } else if (it.type == ModelType.DEEPSEEK) {
+                bindProvider(
+                    DeepseekSessionProvider(
+                        it.settingMap[ModelType.DEEPSEEK]?.let { it as? DeepseekModelSetting }?.key
+                            ?: ""
+                    )
+                )
             }
         }.launchIn(viewModelScope)
     }

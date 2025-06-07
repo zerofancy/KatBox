@@ -1,6 +1,41 @@
 package top.ntutn.katbox.storage
 
+import androidx.datastore.core.okio.OkioSerializer
 import kotlinx.serialization.Serializable
+import okio.BufferedSink
+import okio.BufferedSource
+import top.ntutn.katbox.getPlatform
 
 @Serializable
-data class ConnectionModel(val url: String)
+enum class ModelType {
+    OLLAMA,
+    DEEPSEEK
+}
+
+interface IModelSetting
+
+@Serializable
+class OllamaModelSetting(val url: String) : IModelSetting
+
+@Serializable
+class DeepseekModelSetting(val key: String) : IModelSetting
+
+@Serializable
+data class ConnectionModel(val type: ModelType, val settingMap: Map<ModelType, IModelSetting>)
+
+object ConnectionSerializer: OkioSerializer<ConnectionModel> {
+    override val defaultValue: ConnectionModel = ConnectionModel(type = ModelType.OLLAMA, settingMap = mapOf())
+
+    override suspend fun readFrom(source: BufferedSource): ConnectionModel {
+        return getPlatform().jsonClient.decodeFromString(source.readUtf8())
+    }
+
+    override suspend fun writeTo(
+        t: ConnectionModel,
+        sink: BufferedSink
+    ) {
+        sink.use {
+            it.writeUtf8(getPlatform().jsonClient.encodeToString(ConnectionModel.serializer(), t))
+        }
+    }
+}
