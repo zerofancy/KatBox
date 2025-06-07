@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import top.ntutn.katbox.logger.loggerFacade
 import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.ChatSessionProvider
+import top.ntutn.katbox.model.Role
 import top.ntutn.katbox.model.deepseek.DeepseekSessionProvider
-import top.ntutn.katbox.model.ollama.OllamaSessionProvider
 import top.ntutn.katbox.storage.ConnectionDataStore
 
 class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
@@ -39,7 +39,7 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
             if (it.url != baseUrl) {
                 baseUrl = it.url
 //                bindProvider(OllamaSessionProvider(it.url))
-                bindProvider(DeepseekSessionProvider("TODO"))
+                bindProvider(DeepseekSessionProvider(""))
             }
         }.launchIn(viewModelScope)
     }
@@ -74,16 +74,16 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
         _historyStateFlow.value += ChatMessage(
             timestamp = System.currentTimeMillis(),
             text = value,
-            role = "User",
+            role = Role.USER,
             completed = true
         )
         _composingMessage.value = ChatMessage(
             timestamp = System.currentTimeMillis(),
             text = "",
-            role = "Assistant",
+            role = Role.ASSISTANT,
             completed = false
         )
-        provider?.chatWithModel("", value)?.collect {
+        provider?.chatWithModel(_historyStateFlow.value, value)?.collect {
             _composingMessage.value = _composingMessage.value?.copy(
                 text = (_composingMessage.value?.text ?: "") + it
             )

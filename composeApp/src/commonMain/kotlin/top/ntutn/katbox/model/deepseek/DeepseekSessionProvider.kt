@@ -9,7 +9,9 @@ import org.oremif.deepseek.api.models
 import org.oremif.deepseek.client.DeepSeekClientStream
 import org.oremif.deepseek.models.ModelInfo
 import org.oremif.deepseek.models.chatCompletionStreamParams
+import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.ChatSessionProvider
+import top.ntutn.katbox.model.Role
 
 class DeepseekSessionProvider(apiKey: String) : ChatSessionProvider {
     private val client = DeepSeekClientStream(apiKey)
@@ -35,16 +37,21 @@ class DeepseekSessionProvider(apiKey: String) : ChatSessionProvider {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun chatWithModel(
-        prompt: String,
+        history: List<ChatMessage>,
         content: String
     ): Flow<String> {
         val params = chatCompletionStreamParams {
             temperature = 0.7
             maxTokens = 1000
         }
-        return client.chat(params) { // todo deepseek api无状态，需要发送历史
-            system(prompt)
-            user(content)
+        return client.chat(params) { // deepseek api无状态，需要发送历史
+            history.takeLast(10).forEach {
+                when(it.role) {
+                    Role.ASSISTANT -> assistant(it.text)
+                    Role.USER -> user(it.text)
+                    Role.SYSTEM -> system(it.text)
+                }
+            }
         }.map {
             it.choices.joinToString("") { it.delta.content ?: "" }
         }
