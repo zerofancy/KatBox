@@ -12,7 +12,7 @@ import top.ntutn.katbox.storage.ModelType
 
 class DeepseekSettingSceneVM(private val dataStore: ConnectionDataStore): ViewModel() {
     private val _inputtingKey = MutableStateFlow("")
-    val inputtingKey: StateFlow<String> = _inputtingKey
+    val initialKey: StateFlow<String> = _inputtingKey
 
     fun onInit() {
         viewModelScope.launch {
@@ -23,14 +23,10 @@ class DeepseekSettingSceneVM(private val dataStore: ConnectionDataStore): ViewMo
         }
     }
 
-    fun onInputChange(newValue: String) {
-        _inputtingKey.value = newValue
-    }
-
-    fun saveData() {
+    fun saveData(data: CharSequence) {
         viewModelScope.launch {
             dataStore.updateCurrentModel(ModelType.DEEPSEEK)
-            dataStore.updateDeepseek(inputtingKey.value)
+            dataStore.updateDeepseek(data.toString())
         }
     }
 }

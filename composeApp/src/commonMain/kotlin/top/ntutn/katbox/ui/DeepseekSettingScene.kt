@@ -2,9 +2,10 @@ package top.ntutn.katbox.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.text.BasicSecureTextField
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,18 +23,23 @@ fun DeepseekSettingScene(dataStore: ConnectionDataStore, modifier: Modifier = Mo
     val viewModel = viewModel { DeepseekSettingSceneVM(dataStore) }
 
     Column(modifier = modifier) {
+        val url by viewModel.initialKey.collectAsState(Dispatchers.Main.immediate)
+        val state = rememberTextFieldState(initialText = url)
+        LaunchedEffect(url) {
+            state.edit {
+                replace(0, length, url)
+            }
+        }
         Row {
             Text("key")
-            val url by viewModel.inputtingKey.collectAsState(Dispatchers.Main.immediate)
-            val transformation = remember { PasswordVisualTransformation() }
-            TextField(value = url, onValueChange = viewModel::onInputChange, visualTransformation = transformation)
+            BasicSecureTextField(state = state)
         }
         Row {
             Button(onClick = onCloseSetting) {
                 Text("取消")
             }
             Button(onClick = {
-                viewModel.saveData()
+                viewModel.saveData(state.text)
                 onCloseSetting()
             }) {
                 Text("保存")
