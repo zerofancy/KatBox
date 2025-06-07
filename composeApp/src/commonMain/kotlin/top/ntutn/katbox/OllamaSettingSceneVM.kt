@@ -10,7 +10,7 @@ import top.ntutn.katbox.storage.ConnectionDataStore
 import top.ntutn.katbox.storage.ModelType
 import top.ntutn.katbox.storage.OllamaModelSetting
 
-class SettingSceneVM(private val dataStore: ConnectionDataStore): ViewModel() {
+class OllamaSettingSceneVM(private val dataStore: ConnectionDataStore): ViewModel() {
     private val _inputtingUrl = MutableStateFlow("")
     val inputtingUrl: StateFlow<String> = _inputtingUrl
 

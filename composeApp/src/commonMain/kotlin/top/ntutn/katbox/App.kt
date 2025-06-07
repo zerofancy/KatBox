@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import top.ntutn.katbox.storage.Factory
 import top.ntutn.katbox.ui.ChatScene
-import top.ntutn.katbox.ui.SettingScene
+import top.ntutn.katbox.ui.OllamaSettingScene
 
 @Composable
 fun App(factory: Factory) {
@@ -20,7 +20,7 @@ fun App(factory: Factory) {
         val viewModel = viewModel { ChatAreaViewModel(dataStore) }
         var settingOpen by remember { mutableStateOf(false) }
         if (settingOpen) {
-            SettingScene(dataStore) {
+            OllamaSettingScene(dataStore) {
                 settingOpen = false
             }
         } else {

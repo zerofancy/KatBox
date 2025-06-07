@@ -12,12 +12,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers
-import top.ntutn.katbox.SettingSceneVM
+import top.ntutn.katbox.OllamaSettingSceneVM
 import top.ntutn.katbox.storage.ConnectionDataStore
 
 @Composable
-fun SettingScene(dataStore: ConnectionDataStore, modifier: Modifier = Modifier, onCloseSetting: () -> Unit = {}) {
-    val viewModel = viewModel { SettingSceneVM(dataStore) }
+fun OllamaSettingScene(dataStore: ConnectionDataStore, modifier: Modifier = Modifier, onCloseSetting: () -> Unit = {}) {
+    val viewModel = viewModel { OllamaSettingSceneVM(dataStore) }
 
     Column(modifier = modifier) {
         Row {
