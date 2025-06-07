@@ -7,19 +7,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import top.ntutn.katbox.storage.ConnectionDataStore
+import top.ntutn.katbox.storage.DeepseekModelSetting
 import top.ntutn.katbox.storage.ModelType
 import top.ntutn.katbox.storage.OllamaModelSetting
 
-class OllamaSettingSceneVM(private val dataStore: ConnectionDataStore): ViewModel() {
+class DeepseekSettingSceneVM(private val dataStore: ConnectionDataStore): ViewModel() {
     private val _inputtingUrl = MutableStateFlow("")
     val inputtingUrl: StateFlow<String> = _inputtingUrl
 
     fun onInit() {
         viewModelScope.launch {
             _inputtingUrl.value = dataStore.connectionData().firstOrNull()
-                ?.settingMap[ModelType.OLLAMA]
-                ?.let { it as? OllamaModelSetting }
-                ?.url ?: ""
+                ?.settingMap[ModelType.DEEPSEEK]
+                ?.let { it as? DeepseekModelSetting }
+                ?.key ?: ""
         }
     }
 
@@ -29,8 +30,8 @@ class OllamaSettingSceneVM(private val dataStore: ConnectionDataStore): ViewMode
 
     fun saveData() {
         viewModelScope.launch {
-            dataStore.updateCurrentModel(ModelType.OLLAMA)
-            dataStore.updateOllama(inputtingUrl.value)
+            dataStore.updateCurrentModel(ModelType.DEEPSEEK)
+            dataStore.updateDeepseek(inputtingUrl.value)
         }
     }
 }
