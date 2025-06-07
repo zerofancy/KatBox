@@ -9,15 +9,14 @@ import kotlinx.coroutines.launch
 import top.ntutn.katbox.storage.ConnectionDataStore
 import top.ntutn.katbox.storage.DeepseekModelSetting
 import top.ntutn.katbox.storage.ModelType
-import top.ntutn.katbox.storage.OllamaModelSetting
 
 class DeepseekSettingSceneVM(private val dataStore: ConnectionDataStore): ViewModel() {
-    private val _inputtingUrl = MutableStateFlow("")
-    val inputtingUrl: StateFlow<String> = _inputtingUrl
+    private val _inputtingKey = MutableStateFlow("")
+    val inputtingKey: StateFlow<String> = _inputtingKey
 
     fun onInit() {
         viewModelScope.launch {
-            _inputtingUrl.value = dataStore.connectionData().firstOrNull()
+            _inputtingKey.value = dataStore.connectionData().firstOrNull()
                 ?.settingMap[ModelType.DEEPSEEK]
                 ?.let { it as? DeepseekModelSetting }
                 ?.key ?: ""
@@ -25,13 +24,13 @@ class DeepseekSettingSceneVM(private val dataStore: ConnectionDataStore): ViewMo
     }
 
     fun onInputChange(newValue: String) {
-        _inputtingUrl.value = newValue
+        _inputtingKey.value = newValue
     }
 
     fun saveData() {
         viewModelScope.launch {
             dataStore.updateCurrentModel(ModelType.DEEPSEEK)
-            dataStore.updateDeepseek(inputtingUrl.value)
+            dataStore.updateDeepseek(inputtingKey.value)
         }
     }
 }

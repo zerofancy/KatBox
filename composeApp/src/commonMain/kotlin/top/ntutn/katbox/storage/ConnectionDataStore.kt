@@ -34,7 +34,7 @@ class ConnectionDataStore(private val produceFilePath: () -> String) {
         db.updateData { prev ->
             val settingMap = prev.settingMap.toMutableMap()
             settingMap[ModelType.DEEPSEEK] = DeepseekModelSetting(key)
-            prev
+            prev.copy(settingMap = settingMap)
         }
     }
 }

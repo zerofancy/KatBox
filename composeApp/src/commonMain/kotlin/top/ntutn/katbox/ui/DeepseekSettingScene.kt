@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers
 import top.ntutn.katbox.DeepseekSettingSceneVM
-import top.ntutn.katbox.OllamaSettingSceneVM
 import top.ntutn.katbox.storage.ConnectionDataStore
 
 @Composable
@@ -22,8 +21,8 @@ fun DeepseekSettingScene(dataStore: ConnectionDataStore, modifier: Modifier = Mo
 
     Column(modifier = modifier) {
         Row {
-            Text("连接地址")
-            val url by viewModel.inputtingUrl.collectAsState(Dispatchers.Main.immediate)
+            Text("key")
+            val url by viewModel.inputtingKey.collectAsState(Dispatchers.Main.immediate)
             TextField(value = url, onValueChange = viewModel::onInputChange)
         }
         Row {

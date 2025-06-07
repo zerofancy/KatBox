@@ -34,26 +34,28 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
     val modelsStateFlow: StateFlow<List<String>> = _modelsStateFlow
 
     private var generateContext: List<Int>? = null
-    private var baseUrl = ""
     private var provider: ChatSessionProvider? = null
     private var providerScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 
     init {
         dataStore.connectionData().onEach {
             if (it.type == ModelType.OLLAMA) {
-                bindProvider(
-                    OllamaSessionProvider(
-                        it.settingMap[ModelType.OLLAMA]?.let { it as? OllamaModelSetting }?.url
-                            ?: ""
+                it.settingMap[ModelType.OLLAMA]?.let { it as? OllamaModelSetting }?.url?.let {
+                    bindProvider(
+                        OllamaSessionProvider(
+                            it
+                        )
                     )
-                )
+                }
             } else if (it.type == ModelType.DEEPSEEK) {
-                bindProvider(
-                    DeepseekSessionProvider(
-                        it.settingMap[ModelType.DEEPSEEK]?.let { it as? DeepseekModelSetting }?.key
-                            ?: ""
-                    )
-                )
+                it.settingMap[ModelType.DEEPSEEK]?.let { it as? DeepseekModelSetting }?.key
+                    ?.let {
+                        bindProvider(
+                            DeepseekSessionProvider(
+                                it
+                            )
+                        )
+                    }
             }
         }.launchIn(viewModelScope)
     }
