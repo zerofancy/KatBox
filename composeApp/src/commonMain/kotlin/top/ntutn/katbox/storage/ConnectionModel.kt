@@ -12,16 +12,17 @@ enum class ModelType {
     DEEPSEEK
 }
 
-interface IModelSetting
+@Serializable
+sealed class ModelSetting
 
 @Serializable
-class OllamaModelSetting(val url: String) : IModelSetting
+class OllamaModelSetting(val url: String) : ModelSetting()
 
 @Serializable
-class DeepseekModelSetting(val key: String) : IModelSetting
+class DeepseekModelSetting(val key: String) : ModelSetting()
 
 @Serializable
-data class ConnectionModel(val type: ModelType, val settingMap: Map<ModelType, IModelSetting>)
+data class ConnectionModel(val type: ModelType, val settingMap: Map<ModelType, ModelSetting>)
 
 object ConnectionSerializer: OkioSerializer<ConnectionModel> {
     override val defaultValue: ConnectionModel = ConnectionModel(type = ModelType.OLLAMA, settingMap = mapOf())
