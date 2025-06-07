@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import top.ntutn.katbox.getPlatform
 import top.ntutn.katbox.logger.loggerFacade
+import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.ChatSessionProvider
 
 class OllamaSessionProvider(private val baseUrl: String): ChatSessionProvider {
@@ -57,7 +58,7 @@ class OllamaSessionProvider(private val baseUrl: String): ChatSessionProvider {
     }
 
     override suspend fun chatWithModel(
-        prompt: String,
+        history: List<ChatMessage>,
         content: String
     ): Flow<String> {
         val currentModelName = selectedModel.value?.name ?: return flow { }

@@ -4,17 +4,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import top.ntutn.katbox.storage.ConnectionDataStore
+import top.ntutn.katbox.storage.ModelType
+import top.ntutn.katbox.storage.OllamaModelSetting
 
-class SettingSceneVM(private val dataStore: ConnectionDataStore): ViewModel() {
+class OllamaSettingSceneVM(private val dataStore: ConnectionDataStore): ViewModel() {
     private val _inputtingUrl = MutableStateFlow("")
     val inputtingUrl: StateFlow<String> = _inputtingUrl
 
     fun onInit() {
         viewModelScope.launch {
-            _inputtingUrl.value = dataStore.connectionData().first().url
+            _inputtingUrl.value = dataStore.connectionData().firstOrNull()
+                ?.settingMap[ModelType.OLLAMA]
+                ?.let { it as? OllamaModelSetting }
+                ?.url ?: ""
         }
     }
 
@@ -24,7 +29,8 @@ class SettingSceneVM(private val dataStore: ConnectionDataStore): ViewModel() {
 
     fun saveData() {
         viewModelScope.launch {
-            dataStore.update(inputtingUrl.value)
+            dataStore.updateCurrentModel(ModelType.OLLAMA)
+            dataStore.updateOllama(inputtingUrl.value)
         }
     }
 }

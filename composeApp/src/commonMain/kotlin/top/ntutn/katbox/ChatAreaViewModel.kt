@@ -13,9 +13,13 @@ import kotlinx.coroutines.launch
 import top.ntutn.katbox.logger.loggerFacade
 import top.ntutn.katbox.model.ChatMessage
 import top.ntutn.katbox.model.ChatSessionProvider
+import top.ntutn.katbox.model.Role
 import top.ntutn.katbox.model.deepseek.DeepseekSessionProvider
 import top.ntutn.katbox.model.ollama.OllamaSessionProvider
 import top.ntutn.katbox.storage.ConnectionDataStore
+import top.ntutn.katbox.storage.DeepseekModelSetting
+import top.ntutn.katbox.storage.ModelType
+import top.ntutn.katbox.storage.OllamaModelSetting
 
 class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
     private val _historyStateFlow = MutableStateFlow(listOf<ChatMessage>())
@@ -30,16 +34,28 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
     val modelsStateFlow: StateFlow<List<String>> = _modelsStateFlow
 
     private var generateContext: List<Int>? = null
-    private var baseUrl = ""
     private var provider: ChatSessionProvider? = null
     private var providerScope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 
     init {
         dataStore.connectionData().onEach {
-            if (it.url != baseUrl) {
-                baseUrl = it.url
-                bindProvider(OllamaSessionProvider(it.url))
-//                bindProvider(DeepseekSessionProvider("TODO"))
+            if (it.type == ModelType.OLLAMA) {
+                it.settingMap[ModelType.OLLAMA]?.let { it as? OllamaModelSetting }?.url?.let {
+                    bindProvider(
+                        OllamaSessionProvider(
+                            it
+                        )
+                    )
+                }
+            } else if (it.type == ModelType.DEEPSEEK) {
+                it.settingMap[ModelType.DEEPSEEK]?.let { it as? DeepseekModelSetting }?.key
+                    ?.let {
+                        bindProvider(
+                            DeepseekSessionProvider(
+                                it
+                            )
+                        )
+                    }
             }
         }.launchIn(viewModelScope)
     }
@@ -74,16 +90,16 @@ class ChatAreaViewModel(dataStore: ConnectionDataStore) : ViewModel() {
         _historyStateFlow.value += ChatMessage(
             timestamp = System.currentTimeMillis(),
             text = value,
-            role = "User",
+            role = Role.USER,
             completed = true
         )
         _composingMessage.value = ChatMessage(
             timestamp = System.currentTimeMillis(),
             text = "",
-            role = "Assistant",
+            role = Role.ASSISTANT,
             completed = false
         )
-        provider?.chatWithModel("", value)?.collect {
+        provider?.chatWithModel(_historyStateFlow.value, value)?.collect {
             _composingMessage.value = _composingMessage.value?.copy(
                 text = (_composingMessage.value?.text ?: "") + it
             )

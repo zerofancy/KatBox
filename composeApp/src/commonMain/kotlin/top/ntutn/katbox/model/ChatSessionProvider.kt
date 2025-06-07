@@ -11,5 +11,5 @@ interface ChatSessionProvider {
 
     suspend fun selectModel(modelName: String)
 
-    suspend fun chatWithModel(prompt: String, content: String): Flow<String>
+    suspend fun chatWithModel(history: List<ChatMessage>, content: String): Flow<String>
 }

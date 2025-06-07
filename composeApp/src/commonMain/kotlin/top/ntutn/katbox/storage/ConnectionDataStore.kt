@@ -16,9 +16,25 @@ class ConnectionDataStore(private val produceFilePath: () -> String) {
 
     fun connectionData() = db.data
 
-    suspend fun update(url: String) {
+    suspend fun updateCurrentModel(modelType: ModelType) {
         db.updateData { prev ->
-            prev.copy(url = url)
+            prev.copy(type = modelType)
+        }
+    }
+
+    suspend fun updateOllama(url: String) {
+        db.updateData { prev ->
+            val settingMap = prev.settingMap.toMutableMap()
+            settingMap[ModelType.OLLAMA] = OllamaModelSetting(url = url)
+            prev.copy(settingMap = settingMap)
+        }
+    }
+
+    suspend fun updateDeepseek(key: String) {
+        db.updateData { prev ->
+            val settingMap = prev.settingMap.toMutableMap()
+            settingMap[ModelType.DEEPSEEK] = DeepseekModelSetting(key)
+            prev.copy(settingMap = settingMap)
         }
     }
 }

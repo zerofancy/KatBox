@@ -29,7 +29,7 @@ fun MessageLine(message: ChatMessage, modifier: Modifier = Modifier) {
         var showOriginMarkdown by remember { mutableStateOf(false) }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = message.role)
+            Text(text = message.role.name)
             Spacer(modifier = Modifier.width(8.dp))
             val sdf = remember { SimpleDateFormat("HH:mm:ss") }
             val timeString = remember(message.timestamp) {
