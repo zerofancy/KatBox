@@ -16,13 +16,13 @@ enum class ModelType {
 sealed class ModelSetting
 
 @Serializable
-class OllamaModelSetting(val url: String) : ModelSetting()
+class OllamaModelSetting(val url: String = "http://127.0.0.1:11434") : ModelSetting()
 
 @Serializable
-class DeepseekModelSetting(val key: String) : ModelSetting()
+class DeepseekModelSetting(val key: String = "") : ModelSetting()
 
 @Serializable
-data class ConnectionModel(val type: ModelType, val settingMap: Map<ModelType, ModelSetting>)
+data class ConnectionModel(val type: ModelType = ModelType.OLLAMA, val settingMap: Map<ModelType, ModelSetting> = mapOf())
 
 object ConnectionSerializer: OkioSerializer<ConnectionModel> {
     override val defaultValue: ConnectionModel = ConnectionModel(type = ModelType.OLLAMA, settingMap = mapOf())
