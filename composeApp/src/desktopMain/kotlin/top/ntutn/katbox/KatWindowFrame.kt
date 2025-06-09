@@ -1,5 +1,7 @@
 package top.ntutn.katbox
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.onDrag
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,9 +12,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
@@ -24,7 +31,7 @@ import katbox.composeapp.generated.resources.kat_box
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun ApplicationScope.KatWindowFrame() {
     Window(
@@ -37,7 +44,18 @@ fun ApplicationScope.KatWindowFrame() {
     ) {
         Surface(shadowElevation = 4.dp) {
             WindowDraggableArea {
-                Row(Modifier.fillMaxWidth()) {
+                var currentTitlePointer by remember { mutableStateOf(PointerIcon.Default) }
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .pointerHoverIcon(currentTitlePointer)
+                        .onDrag(enabled = true, onDrag = {}, onDragStart = {
+                            currentTitlePointer = PointerIcon.Hand
+                        }, onDragEnd = {
+                            currentTitlePointer = PointerIcon.Default
+                        }, onDragCancel = {
+                            currentTitlePointer = PointerIcon.Default
+                        })
+                ) {
                     IconButton(onClick = {}) {
                         Icon(
                             painterResource(Res.drawable.kat_box),
