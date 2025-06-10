@@ -2,6 +2,7 @@ package top.ntutn.katbox
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.onDrag
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,8 +20,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
@@ -33,43 +36,47 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun ApplicationScope.KatWindowFrame() {
+fun ApplicationScope.KatWindowFrame(title: String, icon: Painter, content: @Composable () -> Unit = {}, menuContent: @Composable () -> Unit = {}) {
     Window(
         onCloseRequest = {
             exitApplication()
         },
-        title = stringResource(Res.string.app_name),
-        icon = painterResource(Res.drawable.kat_box),
+        title = title,
+        icon = icon,
         decoration = WindowDecoration.Undecorated()
     ) {
-        Surface(shadowElevation = 4.dp) {
-            WindowDraggableArea {
-                var currentTitlePointer by remember { mutableStateOf(PointerIcon.Default) }
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                        .pointerHoverIcon(currentTitlePointer)
-                        .onDrag(enabled = true, onDrag = {}, onDragStart = {
-                            currentTitlePointer = PointerIcon.Hand
-                        }, onDragEnd = {
-                            currentTitlePointer = PointerIcon.Default
-                        }, onDragCancel = {
-                            currentTitlePointer = PointerIcon.Default
-                        })
-                ) {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painterResource(Res.drawable.kat_box),
-                            contentDescription = stringResource(Res.string.app_name),
-                            tint = Color.Unspecified
-                        )
-                    }
-                    Text(stringResource(Res.string.app_name))
-                    Spacer(Modifier.weight(1f))
-                    TextButton(onClick = ::exitApplication) {
-                        Text("X")
+        Column {
+            Surface(shadowElevation = 4.dp) {
+                WindowDraggableArea {
+                    var currentTitlePointer by remember { mutableStateOf(PointerIcon.Default) }
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .pointerHoverIcon(currentTitlePointer)
+                            .onDrag(enabled = true, onDrag = {}, onDragStart = {
+                                currentTitlePointer = PointerIcon.Hand
+                            }, onDragEnd = {
+                                currentTitlePointer = PointerIcon.Default
+                            }, onDragCancel = {
+                                currentTitlePointer = PointerIcon.Default
+                            }),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = {}) {
+                            Icon(
+                                icon,
+                                contentDescription = title,
+                                tint = Color.Unspecified
+                            )
+                        }
+                        Text(title, overflow = TextOverflow.Ellipsis, maxLines = 1)
+                        Spacer(Modifier.weight(1f))
+                        TextButton(onClick = ::exitApplication) {
+                            Text("X")
+                        }
                     }
                 }
             }
+            content()
         }
     }
 }
