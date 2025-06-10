@@ -45,38 +45,74 @@ fun ApplicationScope.KatWindowFrame(title: String, icon: Painter, content: @Comp
         icon = icon,
         decoration = WindowDecoration.Undecorated()
     ) {
-        Column {
-            Surface(shadowElevation = 4.dp) {
-                WindowDraggableArea {
-                    var currentTitlePointer by remember { mutableStateOf(PointerIcon.Default) }
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .pointerHoverIcon(currentTitlePointer)
-                            .onDrag(enabled = true, onDrag = {}, onDragStart = {
-                                currentTitlePointer = PointerIcon.Hand
-                            }, onDragEnd = {
-                                currentTitlePointer = PointerIcon.Default
-                            }, onDragCancel = {
-                                currentTitlePointer = PointerIcon.Default
-                            }),
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = {}) {
-                            Icon(
-                                icon,
-                                contentDescription = title,
-                                tint = Color.Unspecified
-                            )
+        var currentTitlePointer by remember { mutableStateOf(PointerIcon.Default) }
+        var menuVisibility by remember { mutableStateOf(false) }
+        if (menuVisibility) {
+            Row {
+                Column {
+                    WindowDraggableArea {
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                                .pointerHoverIcon(currentTitlePointer)
+                                .onDrag(enabled = true, onDrag = {}, onDragStart = {
+                                    currentTitlePointer = PointerIcon.Hand
+                                }, onDragEnd = {
+                                    currentTitlePointer = PointerIcon.Default
+                                }, onDragCancel = {
+                                    currentTitlePointer = PointerIcon.Default
+                                }),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        ) {
+                            IconButton(onClick = {
+                                menuVisibility = false
+                            }) {
+                                Icon(
+                                    icon,
+                                    contentDescription = title,
+                                )
+                            }
+                            Text(title, overflow = TextOverflow.Ellipsis, maxLines = 1)
                         }
-                        Text(title, overflow = TextOverflow.Ellipsis, maxLines = 1)
-                        Spacer(Modifier.weight(1f))
-                        TextButton(onClick = ::exitApplication) {
-                            Text("X")
+                    }
+                    menuContent()
+                }
+                content()
+            }
+        } else {
+            Column {
+                Surface(shadowElevation = 4.dp) {
+                    WindowDraggableArea {
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                                .pointerHoverIcon(currentTitlePointer)
+                                .onDrag(enabled = true, onDrag = {}, onDragStart = {
+                                    currentTitlePointer = PointerIcon.Hand
+                                }, onDragEnd = {
+                                    currentTitlePointer = PointerIcon.Default
+                                }, onDragCancel = {
+                                    currentTitlePointer = PointerIcon.Default
+                                }),
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        ) {
+                            IconButton(onClick = {
+                                menuVisibility = true
+                            }) {
+                                Icon(
+                                    icon,
+                                    contentDescription = title,
+                                    tint = Color.Unspecified
+                                )
+                            }
+                            Text(title, overflow = TextOverflow.Ellipsis, maxLines = 1)
+                            Spacer(Modifier.weight(1f))
+                            TextButton(onClick = ::exitApplication) {
+                                Text("X")
+                            }
                         }
                     }
                 }
+                content()
             }
-            content()
         }
     }
 }
