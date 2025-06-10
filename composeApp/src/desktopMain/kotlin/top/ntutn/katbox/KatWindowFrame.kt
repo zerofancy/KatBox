@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,15 +29,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowDecoration
-import katbox.composeapp.generated.resources.Res
-import katbox.composeapp.generated.resources.app_name
-import katbox.composeapp.generated.resources.kat_box
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun ApplicationScope.KatWindowFrame(title: String, icon: Painter, content: @Composable () -> Unit = {}, menuContent: @Composable () -> Unit = {}) {
+fun ApplicationScope.KatWindowFrame(
+    title: String,
+    icon: Painter,
+    content: @Composable () -> Unit = {},
+    menuContent: @Composable () -> Unit = {}
+) {
     Window(
         onCloseRequest = {
             exitApplication()
@@ -49,32 +50,34 @@ fun ApplicationScope.KatWindowFrame(title: String, icon: Painter, content: @Comp
         var menuVisibility by remember { mutableStateOf(false) }
         if (menuVisibility) {
             Row {
-                Column {
-                    WindowDraggableArea {
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
-                                .pointerHoverIcon(currentTitlePointer)
-                                .onDrag(enabled = true, onDrag = {}, onDragStart = {
-                                    currentTitlePointer = PointerIcon.Hand
-                                }, onDragEnd = {
-                                    currentTitlePointer = PointerIcon.Default
-                                }, onDragCancel = {
-                                    currentTitlePointer = PointerIcon.Default
-                                }),
-                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                        ) {
-                            IconButton(onClick = {
-                                menuVisibility = false
-                            }) {
-                                Icon(
-                                    icon,
-                                    contentDescription = title,
-                                )
+                Surface(shadowElevation = 4.dp) {
+                    Column(Modifier.width(200.dp)) {
+                        WindowDraggableArea {
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                                    .pointerHoverIcon(currentTitlePointer)
+                                    .onDrag(enabled = true, onDrag = {}, onDragStart = {
+                                        currentTitlePointer = PointerIcon.Hand
+                                    }, onDragEnd = {
+                                        currentTitlePointer = PointerIcon.Default
+                                    }, onDragCancel = {
+                                        currentTitlePointer = PointerIcon.Default
+                                    }),
+                                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                            ) {
+                                IconButton(onClick = {
+                                    menuVisibility = false
+                                }) {
+                                    Icon(
+                                        icon,
+                                        contentDescription = title,
+                                    )
+                                }
+                                Text(title, overflow = TextOverflow.Ellipsis, maxLines = 1)
                             }
-                            Text(title, overflow = TextOverflow.Ellipsis, maxLines = 1)
                         }
+                        menuContent()
                     }
-                    menuContent()
                 }
                 content()
             }
