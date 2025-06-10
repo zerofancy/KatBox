@@ -45,7 +45,7 @@ class DeepseekSessionProvider(apiKey: String) : ChatSessionProvider {
             maxTokens = 1000
         }
         return client.chat(params) { // deepseek api无状态，需要发送历史
-            history.takeLast(10).forEach {
+            history.forEach {
                 when(it.role) {
                     Role.ASSISTANT -> assistant(it.text)
                     Role.USER -> user(it.text)

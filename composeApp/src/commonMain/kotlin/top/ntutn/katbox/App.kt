@@ -61,7 +61,7 @@ enum class SettingPosition {
 
 @Composable
 fun SelectModelScreen(modifier: Modifier = Modifier, onSelectOllama: () -> Unit = {}, onSelectDeepseek: () -> Unit = {}) {
-    Column {
+    Column(modifier = modifier) {
         Button(onClick = onSelectOllama) {
             Text("Ollama")
         }
